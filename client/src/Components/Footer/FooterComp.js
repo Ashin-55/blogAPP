@@ -1,4 +1,4 @@
-import { Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import { red } from "@mui/material/colors";
@@ -12,13 +12,14 @@ const useStyles = makeStyles({
 const FooterComp = () => {
   const classes = useStyles();
   return (
-    <div>
-      <footer className={classes.footer}>
-        <Container maxWidth='xl' sx={{ backgroundColor: "grey" }}>
-          <Typography align='center'>footer</Typography>
-        </Container>
-      </footer>
-    </div>
+    <>
+      <Box sx={{ backgroundColor: "#bdbdbd" }}>
+        <Typography align='center' sx={{ padding: "3%" }}>
+          Copyright © 1998-2022 Be on the ROAD Travel Group, All Rights
+          Reserved.
+        </Typography>
+      </Box>
+    </>
   );
 };
 

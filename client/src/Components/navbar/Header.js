@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
+  Badge,
   Button,
-  ButtonGroup,
   Tab,
   Tabs,
   Toolbar,
@@ -10,48 +10,44 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import DrawerComp from "./DrawerComp";
-import { makeStyles } from "@material-ui/styles";
+import { Link, useNavigate } from "react-router-dom";
+import { styled } from "@mui/material/styles";
 
-const useStyles = makeStyles((theme) => ({
-  title: {
-    flexGrow: 1,
-  },
-  mainlogo: {
-    justifyContent: "center",
-  },
-  tagline: {
-    fontSize: 20,
-    textTransform: "uppercase",
-    justifyContent: "center",
-    fontFamily: "Montserrat",
-    flexGrow: 1,
-  },
-}));
-const Header = () => {
+import DrawerComp from "./DrawerComp";
+import { useStyles } from "./headerStyles";
+import { ChatState } from "../../Context/ChatProvider";
+
+const Header = ({ premium }) => {
+  const { notification } = ChatState();
   const classes = useStyles();
   const [value, setValue] = useState(0);
+  const [useractive, setUseractive] = useState(false);
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("md"));
-  const navOptions = [
-    {
-      text: "HOME",
-      path: "/",
-    },
-    {
-      text: "Explore",
-      path: "/explore",
-    },
-    {
-      text: "Become an Writer",
-      path: "/becomewriter",
-    },
-    {
-      text: "Favorites",
-      path: "/favorites",
-    },
-  ];
-  console.log(isMatch);
+
+  const login = () => {
+    navigate("/login");
+  };
+
+  const logout = () => {
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("userInfo2");
+    localStorage.removeItem("userId");
+    navigate("/login");
+  };
+
+  const premiumHandler = () => {
+    navigate("/premium");
+  };
+
+  const userInfo = localStorage.getItem("userInfo");
+  useEffect(() => {
+    if (userInfo) {
+      setUseractive(true);
+    }
+  }, []);
+
   return (
     <>
       <AppBar
@@ -61,16 +57,15 @@ const Header = () => {
         <Toolbar>
           {isMatch ? (
             <>
-              <Typography variant='title'>
-                <img src='../Logo.png' alt='logo' height={30} />
-              </Typography>
               <Typography
+                component={Link}
+                to='/'
                 sx={{
                   fontWeight: "bold",
                   paddingRight: "10%",
-                  paddingLeft: ".5%",
-                  paddingTop: "3%",
-                  fontSize: 10,
+                  fontSize: 20,
+                  color: "white",
+                  textDecoration: "none",
                 }}
               >
                 Be on the ROAD
@@ -79,20 +74,20 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Typography variant='title'>
-                <img src='../Logo.png' alt='logo' height={40} />
-              </Typography>
               <Typography
+                component={Link}
+                to='/'
                 sx={{
                   fontWeight: "bold",
                   paddingRight: "1%",
                   paddingLeft: ".5%",
-                  paddingTop: "2%",
+                  fontSize: 20,
+                  color: "white",
+                  textDecoration: "none",
                 }}
               >
                 Be on the ROAD
               </Typography>
-
               <Tabs
                 sx={{ marginLeft: "10px" }}
                 textColor='inherit'
@@ -100,29 +95,91 @@ const Header = () => {
                 indicatorColor='primary'
                 onChange={(e, value) => setValue(value)}
               >
-                {navOptions.map((item) => (
-                  <Tab key={item.text} label={item.text} />
-                ))}
-              </Tabs>
-              <ButtonGroup sx={{ marginLeft: "auto" }}>
-                <Button variant='contained'>Login</Button>
-                <Button variant='contained'>Signup</Button>
-              </ButtonGroup>
+                <Tab key={"Home"} label={"Home"} component={Link} to={"/"} />
+                <Tab
+                  key={"Explore"}
+                  label={"Explore"}
+                  component={Link}
+                  to={"/explore"}
+                />
+                <Tab
+                  key={"Writer"}
+                  label={"Become an Writer"}
+                  component={Link}
+                  to={"/author/authorLogin"}
+                />
+                {userInfo && (
+                  <Tab
+                    key={"Favorites"}
+                    label={"Favorites"}
+                    component={Link}
+                    to={"/wishlist  "}
+                  />
+                )}
+                {userInfo && (
+                 
+                    <Tab
+                      key={"message"}
+                      label={
+                        <Badge
+                          badgeContent={notification.length}
+                          color='error'
+                          showZero
+                        >
+                          Chat
+                        </Badge>
+                      }
+                      component={Link}
+                      to={"/chat"}
+                    />
+               
+                )}
+                {userInfo && (
+                  <Tab
+                    key={"profile"}
+                    label={"Profile"}
+                    component={Link}
+                    to={"/profile"}
+                  />
+                )}
+              </Tabs>{" "}
+              {userInfo && (
+                <Button
+                  variant='outlined'
+                  color='warning'
+                  sx={{ marginLeft: "auto", marginRight: "1%" }}
+                  onClick={premiumHandler}
+                >
+                  Premium
+                </Button>
+              )}
+              {userInfo ? (
+                <Button variant='contained' onClick={logout}>
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  variant='contained'
+                  onClick={login}
+                  sx={{ marginLeft: "auto", marginRight: "1%" }}
+                >
+                  Login
+                </Button>
+              )}
             </>
           )}
         </Toolbar>
       </AppBar>
       <Toolbar className={classes.mainlogo}>
         <img
-          src='./images/MainLogo.png'
+          src='../../images/MainLogo.png'
           alt='logo'
           style={{ width: "30%", height: "auto" }}
         />
       </Toolbar>
-      <Toolbar className={classes.tagline} sx={{marginBottom:"2.5%"}}>
+      <Toolbar className={classes.tagline} sx={{ marginBottom: "2.5%" }}>
         OFFBEAT PLACES UNTOLD STORIES
       </Toolbar>
-    
     </>
   );
 };

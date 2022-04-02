@@ -8,9 +8,9 @@ const Homepage = () => {
   return (
     <div>
       <Header />
-      {/* <Grid container spacing={2}>
-        <BodyContent />
-      </Grid> */}
+      <Grid container spacing={2} sx={{backgroundColor:"whitesmoke",marginBottom:"3%" }}>
+        <BodyContent author={false}/>
+      </Grid>
       <FooterComp/>
     </div>
   );
