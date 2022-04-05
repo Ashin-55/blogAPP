@@ -97,6 +97,12 @@ const AdminHeader = () => {
                   component={Link}
                   to={"/admin/authors"}
                 />
+                <Tab
+                  key={"explore"}
+                  label={"Explore Data"}
+                  component={Link}
+                  to={"/admin/viewExplore"}
+                />
               </Tabs>
               <Button
                 sx={{ marginLeft: "auto" }}

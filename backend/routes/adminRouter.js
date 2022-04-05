@@ -10,7 +10,12 @@ const {
   premiumCount,
   getAuthorPostDetails,
   deletePost,
-  getAuthorDetail
+  getAuthorDetail,
+  blockUser,
+  unBlockUser,
+  createExploreData,
+  fetchExploreData,
+  deleteExplorePost
 } = require("../controllers/adminController");
 
 const adminProtect = require("../middleware/adminAuthMiddleware");
@@ -26,7 +31,13 @@ router.get("/activeAuthor", adminProtect, activeAuthor);
 router.get("/premiumCount", adminProtect, premiumCount);
 router.get("/getAuthorPostDetails/:id",adminProtect,getAuthorPostDetails)
 router.get("/getAuthorData/:id",adminProtect,getAuthorDetail)
+router.get("/blockUser/:id",adminProtect,blockUser)
+router.get("/unblockUser/:id",adminProtect,unBlockUser)
+router.get("/exploreData",adminProtect,fetchExploreData)
 
 router.delete("/postDelete/:id",adminProtect,deletePost)
+router.delete("/deleteExploreData/:id",adminProtect,deleteExplorePost)
+//exploreData
+router.post("/exploreData",adminProtect,createExploreData)
 
 module.exports = router;

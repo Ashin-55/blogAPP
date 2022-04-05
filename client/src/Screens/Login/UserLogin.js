@@ -30,19 +30,21 @@ const UserLogin = () => {
   const userInfo = localStorage.getItem("userInfo");
 
   const responseSuccessGoogle = (response) => {
-    console.log("first calling the google login");
+
     //  console.log(response.tokenId)
     // const data = response.tokenId
     axios
       .post("/googleLogin", { data: { tokenId: response.tokenId } })
       .then((result) => {
-        console.log(result);
-
-        localStorage.setItem("userInfo", result.data.token);
-        localStorage.setItem("userInfo2", JSON.stringify(result.data));
-        localStorage.setItem("userId", result.data._id);
-        toast("Login successfull", { type: "success" });
-        navigate("/");
+        if (result.data.permission) {
+          localStorage.setItem("userInfo", result.data.token);
+          localStorage.setItem("userInfo2", JSON.stringify(result.data));
+          localStorage.setItem("userId", result.data._id);
+          toast("Login successfull", { type: "success",autoClose:2000 });
+          navigate("/");
+        } else {
+          toast(result.data.message, { type: "error" });
+        }
       })
       .catch((error) => {
         toast("Login failed Try Again", { type: "error" });
@@ -51,7 +53,7 @@ const UserLogin = () => {
       });
   };
   const responseErrorGoogle = (response) => {
-    console.log(response);
+    console.log("error response from google",response);
   };
 
   useEffect(() => {
@@ -72,17 +74,23 @@ const UserLogin = () => {
     axios
       .post("http://localhost:3500/login", loginData)
       .then((res) => {
-        console.log("the response is ", res);
+    
         // alert(res.data.message);
-        localStorage.setItem("userInfo", res.data.token);
-        localStorage.setItem("userInfo2", JSON.stringify(res.data));
-        localStorage.setItem("userId", res.data._id);
-        navigate("/");
+        if (res.data.permission) {
+          localStorage.setItem("userInfo", res.data.token);
+          localStorage.setItem("userInfo2", JSON.stringify(res.data));
+          localStorage.setItem("userId", res.data._id);
+          toast("Login successfull", { type: "success",autoClose:2000 });
+          navigate("/");
+        } else {
+          toast(res.data.message, { type: "error" });
+        }
       })
       .catch((err) => {
         console.log("login failed");
         console.log(err);
-        alert("login failed ");
+        toast("login failed ", { type: "error" });
+
         navigate("/login");
       });
   };
@@ -135,7 +143,7 @@ const UserLogin = () => {
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      marginTop:"2%"
+                      marginTop: "2%",
                     }}
                   >
                     <Grid>

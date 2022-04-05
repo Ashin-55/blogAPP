@@ -27,6 +27,8 @@ import Home from "./Screens/Admin/Home";
 import UserProfile from "./Screens/profile/UserProfile";
 import UserExplore from "./Screens/Explore/UserExplore";
 import ViewAuthorPost from "./Screens/Admin/ViewAuthorPost";
+import AddExplore from "./Screens/Admin/AddExplore";
+import AllExploreData from "./Screens/Admin/AllExploreData";
 function App() {
   return (
     <Routes>
@@ -35,6 +37,8 @@ function App() {
       <Route path='/admin/alluser' element={<Allusers />} />
       <Route path='/admin/allPreuser' element={<PreUsers />} />
       <Route path='/admin/authors' element={<AllAuthors />} />
+      <Route path='/admin/addExplore' element={<AddExplore />} />
+      <Route path='/admin/viewExplore' element={<AllExploreData />} />
       <Route path='/admin/authorPost/:id' element={<ViewAuthorPost />} />
 
       <Route path='/' exact element={<Homepage />} />

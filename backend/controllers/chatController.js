@@ -1,7 +1,9 @@
+const asyncHandler = require("express-async-handler")
+
 const Chat = require("../model/chatModel");
 const User = require("../model/userModel");
 
-const accessChat = async (req, res) => {
+const  accessChat = asyncHandler(async (req, res) => {
   console.log("here in access chat");
   const { userId } = req.body;
 
@@ -49,7 +51,7 @@ const accessChat = async (req, res) => {
       throw new Error(error.message);
     }
   }
-};
+});
 
 const fetchChats = async (req, res) => {
   // const result1 = await Chat.find()

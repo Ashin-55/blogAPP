@@ -7,6 +7,7 @@ const genarateToken = require("../utils/generateToken");
 const { OAuth2Client } = require("google-auth-library");
 require("dotenv");
 const { v4: uuidv4 } = require("uuid");
+const exploreDataModel = require("../model/exploreDataModel");
 
 const googleClient = new OAuth2Client(
   "165983108609-ctvvdnt4am79qui5uakia5ikhtuj8k66.apps.googleusercontent.com"
@@ -47,10 +48,15 @@ const getAllPost = async (req, res) => {
 const userLogin = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   let user = await userSchema.findOne({ email });
-
-  if (user && (await user.matchPassword(password))) {
+  if (user.status == false) {
+    res.status(200).json({
+      permission: false,
+      message: "Permission blocked by Admin,Try Agin later",
+    });
+  } else if (user && (await user.matchPassword(password))) {
     // console.log("login succ");
     res.status(200).json({
+      permission: true,
       status: "ok",
       message: "login success",
       _id: user._id,
@@ -246,7 +252,7 @@ const checkUser = async (req, res) => {
 //chat message related things
 // /api/user
 const allUsers = asyncHandler(async (req, res) => {
-  const keyword = req.body.search
+  const keyword = req.query.search
     ? {
         $or: [
           { firstName: { $regex: req.query.search, $options: "i" } },
@@ -254,13 +260,14 @@ const allUsers = asyncHandler(async (req, res) => {
         ],
       }
     : {};
+    console.log("the search word is :", keyword);
 
-  const authors = await userSchema
+  const authors = await authorSchema
     .find(keyword)
     .find({ _id: { $ne: req.user._id } });
-  // console.log(authors);
-  // res.status(200).json(authors)
-  res.send(authors);
+  console.log("in chat search user");
+  console.log("the search result is :", authors);
+  // res.send(authors);
 });
 
 const googleLogin = asyncHandler(async (req, res) => {
@@ -349,6 +356,30 @@ const updateProfile = asyncHandler(async (req, res) => {
       });
     });
 });
+
+const getExploreData = asyncHandler(async (req, res) => {
+  try {
+    const data = await exploreDataModel.find();
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("the error is come ", error);
+    res
+      .status(400)
+      .json({ message: "cant fetch all data please try again", error: error });
+  }
+});
+
+const getSingleExploreData = asyncHandler(async (req, res) => {
+  try {
+    const data = await exploreDataModel.findById(req.params.id);
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("the error is ", error);
+    res
+      .status(400)
+      .json({ message: "something wrong try again later", error: error });
+  }
+});
 module.exports = {
   getAllPost,
   userSignup,
@@ -361,6 +392,8 @@ module.exports = {
   googleLogin,
   getProfileData,
   updateProfile,
+  getExploreData,
+  getSingleExploreData,
   /////
   allUsers,
 };

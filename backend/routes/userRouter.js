@@ -11,7 +11,9 @@ const {
   allUsers,
   googleLogin,
   getProfileData,
-  updateProfile
+  updateProfile,
+  getExploreData,
+  getSingleExploreData
 } = require("../controllers/userControllers");
 const protect = require("../middleware/authMiddleware");
 
@@ -20,6 +22,8 @@ router.get("/home",getAllPost)
 router.get("/checkUserPremium/:id",checkUser)
 router.get("/getWishlist/:id", getWishItem);
 router.get("/profileDetails/:id",protect,getProfileData)
+router.get("/allExploreData/",getExploreData)
+router.get("/getSingleExploreData/:id",getSingleExploreData)
 
 router.put("/editProfile/:id",protect,updateProfile)
 

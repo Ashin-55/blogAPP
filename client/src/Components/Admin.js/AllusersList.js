@@ -4,6 +4,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
+import { Button } from "@mui/material";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import moment from "moment";
@@ -12,6 +13,8 @@ import { Container } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Chatloading from "../../skeleton/Chatloading";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -35,9 +38,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 let rows;
 export default function AllusersList() {
-  const navigate = useNavigate()
+  toast.configure();
+  const navigate = useNavigate();
   const [data, setData] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
+  const [refresh, setRefresh] = React.useState(true);
 
   const adminInfo = localStorage.getItem("adminInfo");
   const config = {
@@ -45,16 +50,47 @@ export default function AllusersList() {
       Authorization: `Bearer ${adminInfo}`,
     },
   };
+
+  const userBlockHandler = (userid) => {
+    axios
+      .get(`/admin/blockUser/${userid}`, config)
+      .then((response) => {
+        toast(response.data.message, { type: "success", autoClose: 2000 });
+        setRefresh(!refresh);
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("failed to Block User,Try again ", {
+          type: "error",
+          autoClose: 2000,
+        });
+      });
+  };
+  const userUnblockHandler = async (userid) => {
+    axios
+      .get(`/admin/unblockUser/${userid}`, config)
+      .then((res) => {
+        setRefresh(!refresh);
+        toast(res.data.message, { type: "success", autoClose: 2000 });
+      })
+      .catch((err) => {
+        console.log(err);
+        toast("failed to unBlock User,Try again ", {
+          type: "error",
+          autoClose: 2000,
+        });
+      });
+  };
   const fetchAllUser = async () => {
-    const { data } = await axios.get("/admin/allUser",config);
+    const { data } = await axios.get("/admin/allUser", config);
     setData(data);
     setLoading(false);
   };
   React.useEffect(() => {
-    !adminInfo && navigate("/admin/login")
+    !adminInfo && navigate("/admin/login");
     adminInfo && fetchAllUser();
-  }, []);
-  
+  }, [refresh]);
+
   rows = data;
   return loading ? (
     <Container>
@@ -81,6 +117,9 @@ export default function AllusersList() {
             <StyledTableCell align='center'>
               <b> Join Date</b>
             </StyledTableCell>
+            <StyledTableCell align='center'>
+              <b> Action</b>
+            </StyledTableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -99,6 +138,42 @@ export default function AllusersList() {
               </StyledTableCell>
               <StyledTableCell align='center'>
                 {moment(row.createdAt).format("ll")}
+              </StyledTableCell>
+              <StyledTableCell align='center'>
+                {row.status ? (
+                  <Button
+                    onClick={() => {
+                      userBlockHandler(row._id);
+                    }}
+                    size="small"
+                    
+                    style={{
+                      color: "#ffffff",
+                      backgroundColor: "#e31f09",
+                      minWidth: "52%",
+                      boxSizing:"content-box"
+                    }}
+                    variant='contained'
+                  >
+                    Block
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      userUnblockHandler(row._id);
+                    }}
+                    size="small"
+                    style={{
+                      color: "#ffffff",
+                      backgroundColor: "#53ed28",
+                      minWidth: "52%",
+                      boxSizing:"content-box"
+                    }}
+                    variant='contained'
+                  >
+                    Unblock
+                  </Button>
+                )}
               </StyledTableCell>
             </StyledTableRow>
           ))}
