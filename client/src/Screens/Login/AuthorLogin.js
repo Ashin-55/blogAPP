@@ -40,6 +40,7 @@ const AuthorLogin = () => {
         localStorage.setItem("authorInfo", res.data.token);
         localStorage.setItem("authorId", res.data._id);
         localStorage.setItem("authorFirstname", res.data.firstName);
+        localStorage.setItem("authorInfo2",JSON.stringify(res.data))
         navigate("/author");
       })
       .catch((err) => {

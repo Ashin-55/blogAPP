@@ -7,8 +7,13 @@ const chatSchema = mongoose.Schema(
     users: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: ("userData"),
-        // ref: "authorModel",
+        ref: "userData",
+      },
+    ],
+    authers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "authorModel",
       },
     ],
     latestMessage: {

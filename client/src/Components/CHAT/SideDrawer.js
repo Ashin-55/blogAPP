@@ -28,7 +28,7 @@ import Chatloading from "../../skeleton/Chatloading";
 import UserListItem from "../ChatUserlistItem/UserListItem";
 import { getSender } from "../../ChatConfig/ChatLogic";
 
-const SideDrawer = () => {
+const SideDrawer = ({ author }) => {
   toast.configure();
   const {
     user,
@@ -57,7 +57,7 @@ const SideDrawer = () => {
   const handleSearch = async () => {
     if (!search) {
       toast("Enter something", {
-        type: "error",
+        type: "warning",
         autoClose: 1000,
         position: "top-right",
       });
@@ -96,7 +96,6 @@ const SideDrawer = () => {
       setSelectedChat(data);
       setOpenDrawer(false);
     } catch (error) {
-     
       toast("error occured", {
         type: "error",
         autoClose: 1000,
@@ -105,62 +104,64 @@ const SideDrawer = () => {
     }
   };
   return (
-    <>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: "grey",
-          width: "100%",
-          marginTop: "1%",
-        }}
-      >
-        <Tooltip title='Search users to chat ' arrow placement='bottom'>
-          <Button variant='outlined' onClick={() => setOpenDrawer(true)}>
-            <SearchIcon />
-            <Typography> Search Author</Typography>
-          </Button>
-        </Tooltip>
-      </Box>
-      <Drawer open={OpenDrawer} onClose={() => setOpenDrawer(false)}>
-        <List>
-          <ListItemButton>
-            <ListItemIcon>
-              <ListItemText>Search Author</ListItemText>
-            </ListItemIcon>
-          </ListItemButton>
-        </List>
-        <List>
-          <Box display='flex' padding={2}>
-            <TextField
-              placeholder='Author Name or Email'
-              sx={{ marginX: "2%" }}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button variant='outlined' onClick={handleSearch}>
-              Go
+    !author && (
+      <>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            backgroundColor: "grey",
+            width: "100%",
+            marginTop: "1%",
+          }}
+        >
+          <Tooltip title='Search users to chat ' arrow placement='bottom'>
+            <Button variant='outlined' onClick={() => setOpenDrawer(true)}>
+              <SearchIcon />
+              <Typography> Search Author</Typography>
             </Button>
-          </Box>
-          {loading ? (
-            <Chatloading />
-          ) : (
-            searchResult?.map((users) => (
-              <UserListItem
-                alignItems='center'
-                key={users._id}
-                user={users}
-                handleFunction={() => accessChat(users._id)}
+          </Tooltip>
+        </Box>
+        <Drawer open={OpenDrawer} onClose={() => setOpenDrawer(false)}>
+          <List>
+            <ListItemButton>
+              <ListItemIcon>
+                <ListItemText>Search Author</ListItemText>
+              </ListItemIcon>
+            </ListItemButton>
+          </List>
+          <List>
+            <Box display='flex' padding={2}>
+              <TextField
+                placeholder='Author Name or Email'
+                sx={{ marginX: "2%" }}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
               />
-            ))
-          )}
-          {loadingChat && (
-            <CircularProgress sx={{ marginLeft: "auto", display: "flex" }} />
-          )}
-        </List>
-      </Drawer>
-    </>
+              <Button variant='outlined' onClick={handleSearch}>
+                Go
+              </Button>
+            </Box>
+            {loading ? (
+              <Chatloading />
+            ) : (
+              searchResult?.map((users) => (
+                <UserListItem
+                  alignItems='center'
+                  key={users._id}
+                  user={users}
+                  handleFunction={() => accessChat(users._id)}
+                />
+              ))
+            )}
+            {loadingChat && (
+              <CircularProgress sx={{ marginLeft: "auto", display: "flex" }} />
+            )}
+          </List>
+        </Drawer>
+      </>
+    )
   );
 };
 

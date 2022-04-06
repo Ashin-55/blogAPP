@@ -3,14 +3,16 @@ import {
   AppBar,
   Badge,
   Button,
+  IconButton,
   Tab,
   Tabs,
   Toolbar,
   Typography,
   useMediaQuery,
-  useTheme,
+  useTheme,Box
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
+import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import { styled } from "@mui/material/styles";
 
 import DrawerComp from "./DrawerComp";
@@ -117,22 +119,20 @@ const Header = ({ premium }) => {
                   />
                 )}
                 {userInfo && (
-                 
-                    <Tab
-                      key={"message"}
-                      label={
-                        <Badge
-                          badgeContent={notification.length}
-                          color='error'
-                          showZero
-                        >
-                          Chat
-                        </Badge>
-                      }
-                      component={Link}
-                      to={"/chat"}
-                    />
-               
+                  <Tab
+                    key={"message"}
+                    label={
+                      <Badge
+                        badgeContent={notification.length}
+                        color='error'
+                        showZero
+                      >
+                        Chat
+                      </Badge>
+                    }
+                    component={Link}
+                    to={"/chat"}
+                  />
                 )}
                 {userInfo && (
                   <Tab
@@ -143,6 +143,20 @@ const Header = ({ premium }) => {
                   />
                 )}
               </Tabs>{" "}
+              {userInfo && (
+                <Box>
+                  <IconButton
+                    // onClick={handleClick}
+                    size='large'
+                    sx={{ ml: 2 ,color:"white"}}
+                    // aria-controls={open ? "account-menu" : undefined}
+                    // aria-haspopup='true'
+                    // aria-expanded={open ? "true" : undefined}
+                  >
+                   <NotificationsActiveIcon/>
+                  </IconButton>
+                </Box>
+              )}
               {userInfo && (
                 <Button
                   variant='outlined'

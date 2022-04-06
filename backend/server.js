@@ -40,7 +40,7 @@ app.use((req, res, next) => {
   res.status(404);
   console.log(error);
   next(error);
-});  
+});
 app.use(errorHandler);
 
 const server = app.listen(port, () => {
@@ -53,28 +53,46 @@ const io = require("socket.io")(server, {
     origin: "http://localhost:3000",
   },
 });
-io.on("connection",(socket)=>{
-  console.log("connected to socket.io")
-  socket.on("setup",(userData)=>{
-    socket.join(userData._id)
-    socket.emit("connected")
-  })
-  socket.on("join chat",(room)=>{
+io.on("connection", (socket) => {
+  console.log("connected to socket.io");
+  socket.on("setup", (userData) => {
+    console.log(userData._id,"hhh")
+    socket.join(userData._id);
+    socket.emit("connected");
+  });
+  socket.on("join chat", (room)  => {
     socket.join(room);
-    console.log("user joined in ROom:"+room)
-  })
-  socket.on("typing",(room)=>socket.in(room).emit("typing"))
-  socket.on("stop typing",(room)=>socket.in(room).emit("stop typing"))
-  socket.on("new message",(newMessageRecieved)=>{
+    console.log("user joined in Room:" + room);
+  });
+  socket.on("typing", (room) => socket.in(room).emit("typing"));
+  socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+  //send user message
+  socket.on("new message", (newMessageRecieved) => {
+
     var chat = newMessageRecieved.chat;
-    if(!chat.users) return console.log("chat.users not defined");
-    chat.users.forEach(user=>{
-      if(user._id==newMessageRecieved.sender._id)return;
-      socket.in(user._id).emit("message recieved",newMessageRecieved)
-    })
-  })
-  socket.off("setup",()=>{
+    console.log("the send message chat is in user",chat)
+    console.log("the send message newMessageRecieved is in user",newMessageRecieved)
+    if (!chat.authers) return console.log("chat.users not defined");
+    chat.authers.forEach((auther) => {
+      console.log(auther)
+      if (auther._id == newMessageRecieved.sender) return;
+      socket.in(auther._id).emit("message recieved", newMessageRecieved);
+    });
+  });
+  //send author message
+  socket.on("new messageAuthor", (newMessageRecieved) => {
+    let chat = newMessageRecieved.chat;
+    console.log("the send message chat is in author",chat)
+    console.log("the send message newMessageRecieved is in author",newMessageRecieved)
+    if (!chat.users) return console.log("chat.users is  not defined");
+    chat.users.forEach((user) => {
+
+      if (user._id == newMessageRecieved.sender) return;
+      socket.in(user._id).emit("message recieved", newMessageRecieved);
+    });
+  });
+  socket.off("setup", () => {
     console.log("USER DISCONNECTED");
-    socket.leave(userData._id)
-  })
-})
+    socket.leave(userData._id);
+  });
+});

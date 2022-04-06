@@ -11,6 +11,8 @@ import axios from "axios";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import React, { useEffect, useState } from "react";
 import io from "socket.io-client";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import { ChatState } from "../../Context/ChatProvider";
 import { getSender } from "../../ChatConfig/ChatLogic";
@@ -18,9 +20,17 @@ import ScrollableChat from "./ScrollableChat";
 import "../../Components/styles.css";
 
 const ENDPOINT = "http://localhost:3500";
-var socket, selectedChatCompare;
-const SingleChat = ({ fetchAgain, setFetchAgain }) => {
-  const { user, selectedChat, setSelectedChat, notification, setNotification} = ChatState();
+let authorToken, socket, selectedChatCompare;
+const SingleChat = ({ fetchAgain, setFetchAgain, author }) => {
+  toast.configure();
+  const {
+    user,
+    authorData,
+    selectedChat,
+    setSelectedChat,
+    notification,
+    setNotification,
+  } = ChatState();
   const [messages, setMessages] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [newMessages, setNewMessages] = React.useState([]);
@@ -30,13 +40,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
 
   useEffect(() => {
     socket = io(ENDPOINT);
-    socket.emit("setup", user);
+    author ? socket.emit("setup", authorData) : socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
   useEffect(() => {
+    authorToken = localStorage.getItem("authorInfo");
     fetchMessages();
     selectedChatCompare = selectedChat;
   }, [selectedChat]);
@@ -47,11 +58,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         selectedChatCompare._id !== newMessageRecieved.chat._id
       ) {
         //give notification
-        if(!notification.includes(newMessageRecieved)){
-          setNotification([newMessageRecieved,...notification])
-          setFetchAgain(!fetchAgain)
+        console.log("in notification part");
+        if (!notification.includes(newMessageRecieved)) {
+          setNotification([newMessageRecieved, ...notification]);
+          setFetchAgain(!fetchAgain);
         }
       } else {
+        console.log("in msg part");
         setMessages([...messages, newMessageRecieved]);
       }
     });
@@ -62,23 +75,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: author
+            ? `Bearer ${authorToken}`
+            : `Bearer ${user.token}`,
         },
       };
       setLoading(true);
-
-      const { data } = await axios.get(
-        `/api/message/${selectedChat._id}`,
-        config
-      );
+      const url = author
+        ? `/api/message/author/${selectedChat._id}`
+        : `/api/message/${selectedChat._id}`;
+      const { data } = await axios.get(url, config);
       console.log("the message::", messages);
+      console.log("the message::", data);
       setMessages(data);
       setLoading(false);
 
       socket.emit("join chat", selectedChat._id);
     } catch (error) {
-      console.log("the fetching error is that ::", error.messages);
-      alert(error.messages);
+      console.log("the fetching error is that ::", error);
+      toast("error occured", {
+        type: "error",
+        autoClose: 1000,
+        position: "top-right",
+      });
     }
   };
   const typingHandler = (e) => {
@@ -106,20 +125,27 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         const config = {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${user.token}`,
+            Authorization: author
+              ? `Bearer ${authorToken}`
+              : `Bearer ${user.token}`,
           },
         };
         setNewMessages("");
+        const url = author ? `/api/message/author` : `/api/message`;
+        console.log(`${url}`);
         const { data } = await axios.post(
-          "/api/message",
+          `${url}`,
           { content: newMessages, chatId: selectedChat._id },
           config
         );
         console.log(data);
+        author
+          ? socket.emit("new messageAuthor", data)
+          : socket.emit("new message", data);
 
-        socket.emit("new message", data);
         setMessages([...messages, data]);
       } catch (error) {
+        console.log(error);
         alert("error occured");
       }
     }
@@ -145,12 +171,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             >
               <ArrowBackIcon />
             </IconButton>
-
-            {!selectedChat.isGroupChat ? (
-              <>{getSender(user, selectedChat.users)}</>
-            ) : (
-              <>{selectedChat.chatName}</>
-            )}
+            {author
+              ? `${selectedChat.users[0].firstName} ${selectedChat.users[0].lastName}`
+              : `${selectedChat.authers[0].firstName}${selectedChat.authers[0].lastName}`}
+            {/* {selectedChat.authers[0].firstName.toUpperCase()} */}
           </Typography>
           <Box
             sx={{
@@ -177,7 +201,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               />
             ) : (
               <div className='messages'>
-                <ScrollableChat messages={messages} />
+                <ScrollableChat messages={messages} author={author} />
               </div>
             )}
 
@@ -202,15 +226,16 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
         <Box
           sx={{
             display: "flex",
+            justifyContent: "center",
             alignContent: "center",
             height: "100%",
-            flexDirection: "row",
+            flexDirection: "column",
           }}
         >
           <Typography
-            sx={{ fontSize: 15, paddingBottom: 3, fontFamily: "Poppins" }}
+            sx={{ fontSize: 28, paddingBottom: 3, fontFamily: "Poppins" }}
           >
-            Click any author to Chat
+            {author ? "Click any user to Chat" : "Click any author to Chat"}
           </Typography>
         </Box>
       )}

@@ -265,9 +265,8 @@ const allUsers = asyncHandler(async (req, res) => {
   const authors = await authorSchema
     .find(keyword)
     .find({ _id: { $ne: req.user._id } });
-  console.log("in chat search user");
-  console.log("the search result is :", authors);
-  // res.send(authors);
+ 
+  res.send(authors);
 });
 
 const googleLogin = asyncHandler(async (req, res) => {

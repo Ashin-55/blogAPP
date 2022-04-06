@@ -97,7 +97,7 @@ const AuthHeader = () => {
                   key={"mesage"}
                   label={"Messages"}
                   component={Link}
-                  to={"/author/message"}
+                  to={"/author/chat"}
                 />
                 <Tab
                   key={"mypost"}

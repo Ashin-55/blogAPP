@@ -63,6 +63,7 @@ function App() {
       {/* <Route path='/author/editProfile/:id' element={<EditAuth />} /> */}
 
       <Route path='/chat' element={<ChatHome />} />
+      <Route path='/author/chat' element={<ChatHome author={true}/>} />
     </Routes>
   );
 }

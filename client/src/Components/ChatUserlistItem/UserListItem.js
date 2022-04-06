@@ -22,6 +22,7 @@ const UserListItem = ({ user, handleFunction }) => {
       paddingX={2}
       paddingY={1}
       marginX={2}
+      marginY={1}
     >
       <Avatar
         sizes='small'

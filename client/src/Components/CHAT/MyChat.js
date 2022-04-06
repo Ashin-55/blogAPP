@@ -5,19 +5,22 @@ import { ChatState } from "../../Context/ChatProvider";
 import Chatloading from "../../skeleton/Chatloading";
 import { getSender } from "../../ChatConfig/ChatLogic";
 
-const MyChat = ({ fetchAgain }) => {
+let authorToken;
+const MyChat = ({ fetchAgain, author }) => {
   const [loggedUser, setLoggedUser] = useState();
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
   const fetchChats = async () => {
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${user.token}`,
+          Authorization: author
+            ? `Bearer ${authorToken}`
+            : `Bearer ${user.token}`,
         },
       };
-
-      const { data } = await axios.get("/api/chat", config);
-      console.log("the servver output",data);
+      const url = author ? "/api/chat/author" : "/api/chat";
+      const { data } = await axios.get(url, config);
+      console.log("the servver output", data);
       setChats(data);
     } catch (error) {
       console.log("the error is ::", error);
@@ -25,6 +28,7 @@ const MyChat = ({ fetchAgain }) => {
     }
   };
   useEffect(() => {
+    authorToken = localStorage.getItem("authorInfo");
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo2")));
     fetchChats();
   }, [fetchAgain]);
@@ -50,7 +54,7 @@ const MyChat = ({ fetchAgain }) => {
         sx={{
           paddingBottom: 3,
           paddingX: 3,
-          fontSize: { xs: "26", sm: "26", md: "28px" },
+          fontSize: { xs: "26px", sm: "26px", md: "28px" },
           display: "flex",
           width: "100%",
           justifyContent: "flex-start",
@@ -85,20 +89,23 @@ const MyChat = ({ fetchAgain }) => {
                   color: selectedChat === chat ? "white" : "black",
                   paddingX: 2,
                   paddingY: 2,
+                  marginY: 0.5,
                   borderRadius: 1,
                 }}
                 key={chat._id}
               >
                 <Typography>
-                  {/* {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
-                    : chat.chatName} */}
-                    
-                  {
+                  {author
+                    ? `${chat.users[0].firstName} ${chat.users[0].lastName}`
+                    : `${chat.authers[0].firstName}${chat.authers[0].lastName}`}
+                  {/* {
+                    console.log(chat),
                     console.log(chat.users.length),
                     console.log("loggedUse", loggedUser)
-                  } 
-                  {chat.users.length > 1 ?getSender(loggedUser, chat.users):"No chats"}
+                  }  */}
+                  {/* {chat.authers.length > 0 && chat.users.length > 0
+                    ? chat.authers[0].firstName
+                    : "No chats"} */}
                 </Typography>
               </Box>
             ))}
