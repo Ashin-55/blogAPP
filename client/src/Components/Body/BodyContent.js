@@ -32,6 +32,7 @@ const BodyContent = ({ author }) => {
   const classes = useStyles();
   const [allPost, setAllPost] = useState([]);
   const [favPostId, setFavPostId] = useState([]);
+  const [likedPostId, setLikedPostId] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [flag, setFlag] = useState(true);
 
@@ -67,6 +68,7 @@ const BodyContent = ({ author }) => {
 
   const likeHandler = async (postId) => {
     let data;
+    const indexx = likedPostId.indexOf(postId);
     author ? (data = { postId, autherId }) : (data = { postId, userId });
     if (author) {
       if (autherId) {
@@ -78,6 +80,11 @@ const BodyContent = ({ author }) => {
     } else {
       if (userId) {
         const likeUser = await axios.post("/likePost", data);
+        if (likeUser.data.value == 1) {
+          likedPostId.push(postId);
+        } else {
+          likedPostId.splice(indexx, 1);
+        }
         toast(`${likeUser.data.message}`, { type: "success", autoClose: 1000 });
       } else {
         toast("Can't add !! login first", { type: "error", autoClose: 1000 });
@@ -103,10 +110,12 @@ const BodyContent = ({ author }) => {
     fetchData();
   }, [flag]);
   //wishlist useEffect
-  useEffect(() => { 
+  useEffect(() => {
     if (userId) {
       (async (id) => {
         const items = await axios.get(`/getWishlist/${id}`);
+        const likedId = await axios.get(`/getLikedList/${id}`);
+        setLikedPostId(likedId.data.likedListIDS);
         setFavPostId(items.data.wishlistIdS);
       })(userId);
     }
@@ -152,7 +161,7 @@ const BodyContent = ({ author }) => {
             lg={3}
             className={classes.outerGrid}
             key={index}
-            sx={{ minHeight: "20%"}}
+            sx={{ minHeight: "20%" }}
           >
             <Card
               variant='outlined'
@@ -184,11 +193,10 @@ const BodyContent = ({ author }) => {
                 subheader={moment(post.createdAt).fromNow()}
               />
               <CardMedia
-                  className={classes.images}
+                className={classes.images}
                 component='img'
-                height='auto' 
+                height='auto'
                 alt='post1'
-              
                 image={post.image1}
               />
               <CardContent>
@@ -196,7 +204,7 @@ const BodyContent = ({ author }) => {
                   className={classes.title}
                   sx={{ fontWeight: "bold" }}
                 >
-                  {post.postTitle.substring(0,60)}..
+                  {post.postTitle.substring(0, 60)}..
                 </Typography>
                 <Typography
                   className={classes.subtitle}
@@ -235,9 +243,16 @@ const BodyContent = ({ author }) => {
                   aria-label='like'
                   onClick={() => {
                     likeHandler(post._id);
+                    setFlag(!flag);
                   }}
                 >
-                  <ThumbUpIcon />
+                  <ThumbUpIcon
+                    style={
+                      likedPostId.indexOf(post._id) >= 0
+                        ? { color: "blue" }
+                        : { color: null }
+                    }
+                  />
                 </IconButton>
               </CardActions>
             </Card>

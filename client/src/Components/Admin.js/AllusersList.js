@@ -4,7 +4,7 @@ import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
-import { Button } from "@mui/material";
+import { Button, Typography } from "@mui/material";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import moment from "moment";
@@ -15,6 +15,9 @@ import Chatloading from "../../skeleton/Chatloading";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Box } from "@mui/system";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -49,6 +52,22 @@ export default function AllusersList() {
     headers: {
       Authorization: `Bearer ${adminInfo}`,
     },
+  };
+
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("All User List", 20, 10);
+    doc.autoTable({
+      columns: [
+        { header: "Name", dataKey: "firstName" },
+        { header: "Email", dataKey: "email" },
+        { header: "Phone", dataKey: "phone" },
+        { header: "Premium Enable", dataKey: "premiumUser" },
+        { header: "Join Date", dataKey: "createdAt" },
+      ],
+      body: data  
+    });
+    doc.save("UserList.pdf");
   };
 
   const userBlockHandler = (userid) => {
@@ -86,6 +105,7 @@ export default function AllusersList() {
     setData(data);
     setLoading(false);
   };
+
   React.useEffect(() => {
     !adminInfo && navigate("/admin/login");
     adminInfo && fetchAllUser();
@@ -98,8 +118,18 @@ export default function AllusersList() {
     </Container>
   ) : (
     <Container style={{ minHeight: "35vw" }}>
-      <h1>All users</h1>
-      <Table size='medium' aria-label='a dense table'>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography variant='h4'>All users</Typography>
+        <Button variant='contained' onClick={generatePDF}>
+          Download Report
+        </Button>
+      </Box>
+      <Table size='medium' aria-label='a dense table' id='report'>
         <TableHead>
           <TableRow>
             <StyledTableCell>
@@ -145,13 +175,12 @@ export default function AllusersList() {
                     onClick={() => {
                       userBlockHandler(row._id);
                     }}
-                    size="small"
-                    
+                    size='small'
                     style={{
                       color: "#ffffff",
                       backgroundColor: "#e31f09",
                       minWidth: "52%",
-                      boxSizing:"content-box"
+                      boxSizing: "content-box",
                     }}
                     variant='contained'
                   >
@@ -162,12 +191,12 @@ export default function AllusersList() {
                     onClick={() => {
                       userUnblockHandler(row._id);
                     }}
-                    size="small"
+                    size='small'
                     style={{
                       color: "#ffffff",
                       backgroundColor: "#53ed28",
                       minWidth: "52%",
-                      boxSizing:"content-box"
+                      boxSizing: "content-box",
                     }}
                     variant='contained'
                   >

@@ -15,10 +15,14 @@ import { styled } from "@mui/material/styles";
 import { makeStyles } from "@material-ui/styles";
 import moment from "moment";
 import axios from "axios";
+import { PieChart, Pie, Tooltip } from "recharts";
+
 import Chatloading from "../../skeleton/Chatloading";
 import GraphSkell from "../../skeleton/GraphSkell";
 import PostDetailsSkeloton from "../../skeleton/PostDetailsSkeloton";
 import { useNavigate } from "react-router-dom";
+
+
 
 const useStyle = makeStyles({
   cardHover: {
@@ -77,6 +81,12 @@ const Dashboard = () => {
     setCount(data4.data);
     setLoading(false);
   };
+
+  const data01 = [
+    { name: "premium users", value: count.premiumUser },
+    { name: "Normal Users", value: count.normalUser },
+    { name: "Total Users", value: (count.normalUser+count.premiumUser) },
+  ];
   useEffect(() => {
     !adminInfo && navigate("/admin/login");
     adminInfo && activeUser();
@@ -87,7 +97,7 @@ const Dashboard = () => {
   return (
     <Container sx={{ paddingBottom: "4%" }}>
       {Loading ? (
-        <Grid container spacing={2}>
+        <Grid container spacing={2} >
           <Grid item sm={12} md={12} lg={12} align='center'>
             <GraphSkell />
           </Grid>
@@ -96,11 +106,28 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       ) : (
-        <Grid container spacing={2}>
-          <Grid item sm={6} md={6} lg={6}>
-            premium user graph
+        <Grid container spacing={2} sx={{backgroundColor:"whitesmoke"}} >
+          <Grid item sm={12} md={6} lg={6} align="center">
+            <PieChart width={250} height={270}>
+              <Pie
+                dataKey='value'
+                isAnimationActive={false}
+                data={data01}
+                outerRadius={80}
+                fill='#09c0e9'
+                label
+              />
+
+              <Tooltip />
+            </PieChart>
+            <Typography sx={{fontSize:"10px"}}>
+              <span>Total:{count.premiumUser}{" "}</span>
+              <span>Normal User:{count.normalUser}{" "}</span>
+              <span>Premium User:{count.premiumUser+count.normalUser}{" "}</span>
+            </Typography>
+            <Typography sx={{fontWeight:"bold"}}>Users Count</Typography>
           </Grid>
-          <Grid item sm={6} md={6} lg={6} align='center'>
+          <Grid item sm={12} md={6} lg={6} align='center'>
             <Card
               sx={{
                 maxWidth: "50%",

@@ -2,47 +2,99 @@ import {
   Button,
   Card,
   CardActions,
-  cardClasses,
   CardContent,
   CardMedia,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   Typography,
+  Slide,
+  Backdrop,
+  CircularProgress
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
 import ForumTwoToneIcon from "@mui/icons-material/ForumTwoTone";
 import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import StarsSharpIcon from "@mui/icons-material/StarsSharp";
 import { pink, blue } from "@mui/material/colors";
 import { useParams, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import moment from "moment";
 
 import { useStyles } from "./style";
 import AuthorDetailsSkeloton from "../../skeleton/AuthorDetailsSkeloton";
 import PostDetailsSkeloton from "../../skeleton/PostDetailsSkeloton";
+import { ChatState } from "../../Context/ChatProvider";
 
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction='down' ref={ref} {...props} />;
+});
+
+let user;
 const AuthorDetailsComp = ({ author }) => {
+  const { chats, setChats, setSelectedChat } = ChatState();
   const navigate = useNavigate();
+
   const classes = useStyles();
   const [loading, setLoading] = useState(true);
   const [authProfile, setAuthProfile] = useState([]);
   const [postData, setPostData] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [backdrop, setBackdrop] = useState(false);
   const { id } = useParams();
   const postDetailHandler = (ID) => {
     author
       ? navigate(`/author/postDetail/${ID}`)
       : navigate(`/postDetail/${ID}`);
   };
+
+  const msgAuthorHandler = async (userId) => {
+  
+    try {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+      const checkUserPremium = await axios.get(`/checkUserPremium/${user._id}`);
+     
+      if (checkUserPremium.data.message.premiumUser) {
+        setBackdrop(true)
+        const { data } = await axios.post("/api/chat", { userId }, config);
+        setBackdrop(false)
+        if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
+        setSelectedChat(data);
+        navigate("/chat");
+      } else {
+        setOpen(true);
+      }
+    } catch (error) {
+      alert("error");
+      console.log(error);
+    }
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
+  const handleClickPremium = ()=>{
+    navigate("/premium")
+  }
   useEffect(() => {
+    user = JSON.parse(localStorage.getItem("userInfo2"));
     const fetchData = async (authorid) => {
       const data = await axios.get(`/author/authordetails/${authorid}`);
       setAuthProfile(data.data.authData);
       setPostData(data.data.postData);
       setLoading(false);
-      console.log(data);
     };
     fetchData(id);
   }, []);
@@ -72,6 +124,12 @@ const AuthorDetailsComp = ({ author }) => {
         </Grid>
       ) : (
         <>
+        <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={backdrop}
+          >
+            <CircularProgress color='inherit' />
+          </Backdrop>
           <Grid
             align='center'
             sx={{
@@ -119,11 +177,15 @@ const AuthorDetailsComp = ({ author }) => {
                   </Grid>
                   <Grid item xs={4}>
                     <CardActions>
-                      <IconButton>
-                        <ForumTwoToneIcon
-                          sx={{ paddingTop: "50%", color: blue[200] }}
-                        />
-                      </IconButton>
+                      {user && (
+                        <IconButton
+                          onClick={() => msgAuthorHandler(authProfile[0]._id)}
+                        >
+                          <ForumTwoToneIcon
+                            sx={{ paddingTop: "50%", color: blue[200] }}
+                          />
+                        </IconButton>
+                      )}
                     </CardActions>
                   </Grid>
                 </Grid>
@@ -213,6 +275,39 @@ const AuthorDetailsComp = ({ author }) => {
               </Grid>
             </Grid>
           </Grid>
+          {/* premium user alert  */}
+          <Dialog
+            transitionDuration={{ enter: 1000, exit: 0 }}
+            open={open}
+            onClose={handleClose}
+            aria-labelledby='alert-dialog-title'
+            aria-describedby='alert-dialog-description'
+            TransitionComponent={Transition}
+          >
+            <DialogTitle align='center'>
+              <StarsSharpIcon style={{ color: "gold" }} sx={{ fontSize: 80 }} />
+            </DialogTitle>
+            <DialogTitle id='alert-dialog-title' align='center'>
+              {"GET PREMIUM MEMBERSHIP"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id='alert-dialog-description'>
+                Get Premium membership to chat with your favorites Authers and
+                get this benifit Life long
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleClose}>Cancel</Button>
+              <Button
+                onClick={handleClickPremium}
+                autoFocus
+                variant='contained'
+                style={{ backgroundColor: "gold", color: "black" }}
+              >
+                Get premium
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Container>

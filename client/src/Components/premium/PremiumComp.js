@@ -7,6 +7,8 @@ import {
   Grid,
   Typography,
   Button,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useStyles } from "./style";
@@ -27,12 +29,15 @@ const PremiumComp = () => {
   const [responsePremium, setResponsePremium] = useState(false);
   const [paymentButton, setPaymentButton] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+
   const [premium] = useState({
     name: "Premium mebership",
     price: 4000,
     description: "Buy membership",
   });
   const handleToken = async (token, addresses) => {
+    setLoading(true)
     try {
       const response = await axios.post("/premium", {
         token,
@@ -42,7 +47,9 @@ const PremiumComp = () => {
       if (response.data.status == "success") {
         toast("Success! Check email for details", { type: "success",autoClose: 2000,  });
         setResponsePremium(true);
+        setLoading(false)
       } else {
+        setLoading(false)
         toast("Something went wrong", { type: "error" });
       }
     } catch (error) {
@@ -73,6 +80,12 @@ const PremiumComp = () => {
         </Grid>
       ) : (
         <Grid container sx={{ paddingBottom: "5%" }}>
+           <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={open}
+          >
+            <CircularProgress color='inherit' />
+          </Backdrop>
           <Grid className={classes.outerGrid} item xs={12}>
             <Card
               className={classes.Card}

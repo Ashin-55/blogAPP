@@ -16,6 +16,7 @@ const ChatProvider = ({ children }) => {
     setUser(userInfo2);
     setauthorData(authorInfo);
     console.log("chat provider",authorInfo)
+    console.log("chat provider",userInfo2)
     // if (!userInfo2) {
     //   navigate("/");
     // }

@@ -14,7 +14,8 @@ const {
   deletePost,
   getEditPostData,
   editPost,
-  editProfile
+  editProfile,
+  checkPostLiked
 } = require("../controllers/authorController");
 
 router.get("/home/:id", getAllPost);
@@ -26,6 +27,7 @@ router.get("/profile/:id", profileData);
 router.get("/editProfile/:id", editProfileData);
 router.get("/deletePost/:id",deletePost)
 router.get("/editPost/:id",getEditPostData)
+router.post("/checkPostLiked",checkPostLiked)
 
 router.post("/editProfile",editProfile)
 router.post("/editPost",editPost)

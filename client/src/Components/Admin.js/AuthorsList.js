@@ -6,10 +6,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import moment from "moment";
 import axios from "axios";
-import { Container,Button } from "@mui/material";
+import { Container, Button, Box, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Chatloading from "../../skeleton/Chatloading";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -36,6 +38,7 @@ export default function PreUsers() {
   const navigate = useNavigate();
   const adminInfo = localStorage.getItem("adminInfo");
   const [data, setData] = React.useState([]);
+  const [printData, setPrintData] = React.useState({});
   const [loading, setLoading] = React.useState(true);
 
   const config = {
@@ -46,15 +49,32 @@ export default function PreUsers() {
 
   const fetchAllUser = async () => {
     const { data } = await axios.get("/admin/allAuthors", config);
+    const result = await axios.get("/admin/allAuthorsPrintData", config);
     setData(data);
+    setPrintData(result.data);
     setLoading(false);
   };
 
-  const viewButtonHandler = (id)=>{
-    navigate(`/admin/authorPost/${id}`)
-  }
+  const viewButtonHandler = (id) => {
+    navigate(`/admin/authorPost/${id}`);
+  };
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("All User List", 20, 10);
+    doc.autoTable({
+      columns: [
+        { header: "First Name", dataKey: "firstName" },
+        { header: "Last Name", dataKey: "lastName" },
+        { header: "Email", dataKey: "email" },
+        { header: "Phone", dataKey: "phone" },
+      ],
+      body: printData,
+    });
+    doc.save("AuthorList.pdf");
+  };
+
   React.useEffect(() => {
-    console.log(adminInfo)
+    console.log(adminInfo);
     // !adminInfo && navigate("/admin/login");
     adminInfo && fetchAllUser();
   }, []);
@@ -64,8 +84,18 @@ export default function PreUsers() {
       <Chatloading />
     </Container>
   ) : (
-    <Container style={{ minHeight: "35vw" }}>
-      <h1>All Author </h1>
+    <Container style={{ minHeight: "35vw" }} id='report'>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography variant='h4'>All Author </Typography>
+        <Button variant='contained' onClick={generatePDF}>
+          Download Report
+        </Button>
+      </Box>
       <Table size='medium' aria-label='a dense table'>
         <TableHead>
           <TableRow>
@@ -93,16 +123,24 @@ export default function PreUsers() {
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <StyledTableCell component='th' scope='row'>
-                {row.authorData[0].firstName} {row.authorData[0].lastName}
+                {row.authorData.firstName} {row.authorData.lastName}
               </StyledTableCell>
               <StyledTableCell align='center'>
-                {row.authorData[0].email}
+                {row.authorData.email}
               </StyledTableCell>
               <StyledTableCell align='center'>
-                {row.authorData[0].phone}
+                {row.authorData.phone}
               </StyledTableCell>
               <StyledTableCell align='center'>{row.count}</StyledTableCell>
-              <StyledTableCell align='center'><Button onClick={()=>{viewButtonHandler(row.authorData[0]._id)}}>View</Button></StyledTableCell>
+              <StyledTableCell align='center'>
+                <Button
+                  onClick={() => {
+                    viewButtonHandler(row.authorData[0]._id);
+                  }}
+                >
+                  View
+                </Button>
+              </StyledTableCell>
             </StyledTableRow>
           ))}
         </TableBody>

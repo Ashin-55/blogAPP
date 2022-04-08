@@ -22,6 +22,7 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import PostDetailsSkeloton from "../../skeleton/PostDetailsSkeloton";
 import { useStyles } from "./styles";
 import Newpost from "../../Screens/CreatePost/Newpost";
+import "./styles.css";
 
 const Mypostdetails = () => {
   toast.configure();
@@ -96,7 +97,12 @@ const Mypostdetails = () => {
           return (
             <Container
               maxWidth='lg'
-              sx={{ boxShadow: 3, borderRadius: 5, padding: "2% 1% 2% 1%" }}
+              sx={{
+                boxShadow: 3,
+                borderRadius: 5,
+                padding: "2% 1% 2% 1%",
+                backgroundColor: "whitesmoke",
+              }}
               key={index}
             >
               <Typography
@@ -112,9 +118,15 @@ const Mypostdetails = () => {
               </Typography>
               <Typography
                 sx={{
-                  fontSize: 40,
+                  // fontSize: 40,
+                  // fontFamily: "Poppins",
+                  // fontWeight: "bold",
+                  fontSize: "2rem",
                   fontFamily: "Poppins",
                   fontWeight: "bold",
+                  backgroundColor: "white",
+                  padding: "3%",
+                  borderRadius: 5,
                 }}
               >
                 {postData.postTitle}
@@ -152,14 +164,28 @@ const Mypostdetails = () => {
               <Grid>
                 <Card
                   className={classes.card}
-                  sx={{ border: "none", boxShadow: "none" }}
+                  sx={{
+                    border: "none",
+                    boxShadow: "none",
+                    height: "auto",
+                    backgroundColor: "whitesmoke",
+                  }}
                 >
-                  <CardMedia
-                    component='img'
-                    alt='post1'
-                    image={postData.image1}
-                    className={classes.images}
-                  />
+                  <Grid
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <CardMedia
+                      component='img'
+                      alt='post1'
+                      image={postData.image1}
+                      className={classes.images}
+                      sx={{ width: "70%" }}
+                    />
+                  </Grid>
                   <CardContent>
                     <Typography
                       sx={{
@@ -172,7 +198,9 @@ const Mypostdetails = () => {
                     >
                       {postData.subTitle}
                     </Typography>
-                    <Typography>{postData.postContent}</Typography>
+                    <Typography className='postContent'>
+                      {postData.postContent}
+                    </Typography>
                   </CardContent>
                   <Typography
                     sx={{
@@ -185,36 +213,80 @@ const Mypostdetails = () => {
                     Added Images
                   </Typography>
                   <Grid container spacing={2}>
-                    <Grid item xs={12} sm={12} md={6}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={6}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       <CardMedia
                         component='img'
                         alt='post1'
                         image={postData.image2}
                         className={classes.images}
+                        sx={{ maxWidth: "70%", minWidth: "70%" }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={6}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       <CardMedia
                         component='img'
                         alt='post1'
                         image={postData.image3}
                         className={classes.images}
+                        sx={{ maxWidth: "70%", minWidth: "70%" }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={6}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       <CardMedia
                         component='img'
                         alt='post1'
                         image={postData.image4}
                         className={classes.images}
+                        sx={{ maxWidth: "70%", minWidth: "70%" }}
                       />
                     </Grid>
-                    <Grid item xs={12} sm={12} md={6}>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={6}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       <CardMedia
                         component='img'
                         alt='post1'
                         image={postData.image5}
                         className={classes.images}
+                        sx={{ maxWidth: "70%", minWidth: "70%" }}
                       />
                     </Grid>
                   </Grid>

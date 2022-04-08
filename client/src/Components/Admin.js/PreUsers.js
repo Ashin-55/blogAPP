@@ -6,10 +6,12 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import moment from "moment";
 import axios from "axios";
-import { Container } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Chatloading from "../../skeleton/Chatloading";
 import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -48,6 +50,22 @@ export default function PreUsers() {
     setData(data);
     setLoadin(false);
   };
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    doc.text("All User List", 20, 10);
+    doc.autoTable({
+      columns: [
+        { header: "Name", dataKey: "firstName" },
+        { header: "Email", dataKey: "email" },
+        { header: "Phone", dataKey: "phone" },
+        { header: "Premium Enable", dataKey: "premiumUser" },
+        { header: "Join Date", dataKey: "createdAt" },
+      ],
+      body: data  
+    });
+    doc.save("PremiumUserList.pdf");
+  };
+
   React.useEffect(() => {
     !adminInfo && navigate("/admin/login");
     adminInfo && fetchAllUser();
@@ -58,8 +76,18 @@ export default function PreUsers() {
       <Chatloading />
     </Container>
   ) : (
-    <Container style={{ minHeight: "35vw" }}>
-      <h1>Premium users</h1>
+    <Container style={{ minHeight: "35vw" }} id='report'>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography variant='h4'>Premium Users</Typography>
+        <Button variant='contained' onClick={generatePDF}>
+          Download Report
+        </Button>
+      </Box>
       <Table size='medium' aria-label='a dense table'>
         <TableHead>
           <TableRow>

@@ -50,6 +50,7 @@ const authLogin = asyncHandler(async (req, res) => {
 
 const createPost = asyncHandler(async (req, res) => {
   const data = req.body;
+  // console.log(data.authorId)
   try {
     const imageone = { image1: data.image1 };
     const imagetwo = { image2: data.image2 };
@@ -57,6 +58,7 @@ const createPost = asyncHandler(async (req, res) => {
     const imagefour = { image4: data.image4 };
     const imagefive = { image5: data.image5 };
 
+   
     const respose1 = await cloudinary.uploader.upload(imageone.image1);
     const respose2 = await cloudinary.uploader.upload(imagetwo.image2);
     const respose3 = await cloudinary.uploader.upload(imagethree.image3);
@@ -77,9 +79,8 @@ const createPost = asyncHandler(async (req, res) => {
       image4: respose4.secure_url,
       image5: respose5.secure_url,
     };
-
+ 
     const postResponse = await postSchema.create(details);
-
     // console.log(postResponse);
     res.status(200).json({ message: "post created succesfully" });
   } catch (error) {
@@ -221,7 +222,7 @@ const likePost = asyncHandler(async (req, res) => {
       })
       .catch((error) => {
         console.log(error);
-        res.status(500).json({ message: error });
+        res.status(500).json({ message:"failed to remove like",error: error });
       });
   } else {
     console.log("not liked post");
@@ -352,6 +353,22 @@ const editProfile = asyncHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+
+const checkPostLiked = asyncHandler(async(req,res)=>{
+  const {id, autherId } = req.body;
+  try {
+    const author =await authorSchema.findById(autherId)
+    console.log(author)
+    const isInArray = author.likedItems.some(function(item){
+      return item.equals(id)
+    })
+    console.log("author sideliked post is in array",isInArray)
+    res.status(200).json({postPresent:isInArray})
+  } catch (error) {
+    console.log("the error is :",error)
+    res.status(400).json({message:"failed",error:error})
+  }
+})
 module.exports = {
   authSignup,
   authLogin,
@@ -368,4 +385,5 @@ module.exports = {
   getEditPostData,
   editPost,
   editProfile,
+  checkPostLiked
 };

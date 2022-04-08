@@ -15,7 +15,7 @@ const {
   unBlockUser,
   createExploreData,
   fetchExploreData,
-  deleteExplorePost
+  deleteExplorePost,allAuthorsPrint
 } = require("../controllers/adminController");
 
 const adminProtect = require("../middleware/adminAuthMiddleware");
@@ -24,6 +24,7 @@ router.post("/login", adminLogin);
 router.get("/allUser", adminProtect, allUsers);
 router.get("/allPreUser", adminProtect, allPreUsers);
 router.get("/allAuthors", adminProtect, allAuthors);
+router.get("/allAuthorsPrintData", adminProtect, allAuthorsPrint);
 //dashBorad
 router.get("/recentPost", adminProtect, recentPost);
 router.get("/newUsers", adminProtect, newUsers);

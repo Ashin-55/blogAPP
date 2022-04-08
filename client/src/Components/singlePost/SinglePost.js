@@ -23,30 +23,100 @@ import PostDetailsSkeloton from "../../skeleton/PostDetailsSkeloton";
 import { useStyles } from "./styles.js";
 import "./styles";
 
-const userId = localStorage.getItem("userId");
-
-const SinglePost = () => {
+let userId;
+let autherId;
+let datas;
+let path;
+let path2;
+const SinglePost = ({ author }) => {
   toast.configure();
   const classes = useStyles();
   const [postDetails, setPostDetails] = useState([]);
+  const [favItem, setFavItem] = useState(false);
+  const [likedItem, setLikedItem] = useState(false);
   const [Loading, setLoading] = useState(true);
+  const [flag, setFlag] = useState(true);
   let { id } = useParams();
+
   const wishlistHaandler = async (postId) => {
     const data = { postId, userId };
     if (userId) {
-      console.log(data);
       const wishRes = await axios.post("/wishlist", data);
+      if (wishRes.data.value == 1) {
+        setFavItem(true);
+      } else {
+        setFavItem(false);
+      }
       toast(`${wishRes.data.message}`, { type: "success" });
     } else {
       toast("Can't add !! login first", { type: "error" });
     }
   };
-  useEffect(async () => {
+
+  const likeHandler = async (postId) => {
+    let data;
+    author ? (data = { postId, autherId }) : (data = { postId, userId });
+    if (author) {
+      alert("auther")
+      if (autherId) {
+        const likeAuth = await axios.post("/author/likePost", data);
+        setFlag(!flag)
+        toast(`${likeAuth.data.message}`, { type: "success", autoClose: 1000 });
+      } else {
+        toast("Can't add !! login first", { type: "error", autoClose: 1000 });
+      }
+    } else {
+      if (userId) {
+
+        console.log(data,"kkkkkk")
+        const likeUser = await axios.post("/likePost", data);
+        console.log("likeuser output",likeUser)
+        if (likeUser.data.value == 0) {
+          setLikedItem(false);
+        } else {
+          setLikedItem(true);
+        }
+        setFlag(!flag)
+        toast(`${likeUser.data.message}`, { type: "success", autoClose: 1000 });
+      } else {
+        toast("Can't add !! login first", { type: "error", autoClose: 1000 });
+      }
+    }
+  };
+
+  const fetchData = async (id) => {
     const postDetail = await axios.get(`/author/postDetail/${id}`);
-    console.log("the post details", postDetail);
     setPostDetails(postDetail.data.postDetails);
     setLoading(false);
-  }, []);
+  };
+  const checkLikedPosts = async (path,datas) => {
+    const likedPostorNot = await axios.post(path, datas);
+    setLikedItem(likedPostorNot.data.postPresent);
+  };
+  const checkWishListPost = async(path2,datas)=>{
+    const favrPostorNot = await axios.post(path2, datas);
+    setFavItem(favrPostorNot.data.postPresent)
+  }
+  useEffect(() => {
+    autherId = localStorage.getItem("authorId");
+    userId = localStorage.getItem("userId");
+    fetchData(id);
+    if (author) {
+      datas = { id, autherId };
+      path = "/author/checkPostLiked";
+      checkLikedPosts(path,datas)
+    } else {
+      if (userId) {
+        datas = { id, userId };
+        path = "/checkPostLikedorNot";
+        path2 ="/chechPostfavrite"
+        checkLikedPosts(path,datas)
+        checkWishListPost(path2,datas)
+      } else {
+        console.log("user not Present");
+      }
+    }
+  }, [flag]);
   return (
     <>
       {Loading && (
@@ -116,17 +186,26 @@ const SinglePost = () => {
                 Liked the post? Please show some sharing love.
               </Typography>
               <div>
+                {author ? null : (
+                  <IconButton
+                    aria-label='add to favorites'
+                    sx={{ margin: "0 3% 0 0 " }}
+                    onClick={() => {
+                      wishlistHaandler(post._id);
+                      setFlag(!flag);
+                    }}
+                  >
+                    <FavoriteIcon sx={{ color: favItem ? "red" : null }} />
+                  </IconButton>
+                )}
                 <IconButton
-                  aria-label='add to favorites'
-                  sx={{ margin: "0 3% 0 0 " }}
+                  aria-label='like'
                   onClick={() => {
-                    wishlistHaandler(post._id);
+                    likeHandler(post._id);
+                    // setFlag(!flag);
                   }}
                 >
-                  <FavoriteIcon />
-                </IconButton>
-                <IconButton aria-label='like'>
-                  <ThumbUpIcon />
+                  <ThumbUpIcon sx={{ color: likedItem ? "blue" : null }} />
                   <div>
                     {"\u00A0"} {post.likeCount} likes
                   </div>
@@ -136,7 +215,6 @@ const SinglePost = () => {
               <Grid>
                 <Card
                   className={classes.card}
-                  sx={{}}
                   sx={{
                     border: "none",
                     boxShadow: "none",
@@ -190,7 +268,7 @@ const SinglePost = () => {
                         fontSize: "20px",
                         backgroundColor: "white",
                         borderRadius: 5,
-                        padding:"5%"
+                        padding: "5%",
                       }}
                     >
                       {post.postContent}
@@ -243,7 +321,7 @@ const SinglePost = () => {
                         alt='post3'
                         image={post.image3}
                         className={classes.subimages}
-                        sx={{ width: "80%",height:"95%" }}
+                        sx={{ width: "80%", height: "95%" }}
                       />
                     </Grid>
                     <Grid
@@ -262,7 +340,7 @@ const SinglePost = () => {
                         alt='post4'
                         image={post.image4}
                         className={classes.subimages}
-                        sx={{ width: "80%",height:"90%" }}
+                        sx={{ width: "80%", height: "90%" }}
                       />
                     </Grid>
                     <Grid
@@ -281,7 +359,7 @@ const SinglePost = () => {
                         alt='post5'
                         image={post.image5}
                         className={classes.subimages}
-                        sx={{ width: "80%",height:"90%" }}
+                        sx={{ width: "80%", height: "90%" }}
                       />
                     </Grid>
                   </Grid>

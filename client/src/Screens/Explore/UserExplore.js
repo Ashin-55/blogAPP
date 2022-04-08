@@ -25,6 +25,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import GraphSkell from "../../skeleton/GraphSkell";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction='up' ref={ref} {...props} />;
 });
@@ -35,6 +36,7 @@ const UserExplore = () => {
   const [allData, setAllData] = React.useState([]);
   const [singleExploreData, setSingleExploreData] = React.useState({});
   const [open, setOpen] = React.useState(false);
+  const [Loading, setLoading] = React.useState(true);
 
   const handleClickOpen = async (id) => {
     try {
@@ -55,6 +57,7 @@ const UserExplore = () => {
       const { data } = await axios.get("/allExploreData");
       console.log(data);
       setAllData(data);
+      setLoading(false);
     } catch (error) {
       console.log("the eror is ", error);
       toast("Something went wrong!! try again", { type: "error" });
@@ -96,28 +99,36 @@ const UserExplore = () => {
               places.
             </Typography>
           </Grid>
-          {allData.map((data) => (
-            <Grid
-              item
-              xs={6}
-              sm={6}
-              md={4}
-              lg={3}
-              key={data._id}
-              className={classes.centerContent}
-            >
-              <Box
-                sx={{ paddingY: "5%" }}
-                onClick={() => handleClickOpen(data._id)}
-              >
-                <LocationOnOutlinedIcon
-                  className={classes.locationIcon}
-                  sx={{ fontSize: "600%" }}
-                />
-                <Typography align='center'>{data.destinationName}</Typography>
-              </Box>
+          {Loading ? (
+            <Grid container spacing={2}>
+              <Grid item sm={12} md={12} lg={12} align='center'>
+                <GraphSkell />
+              </Grid>
             </Grid>
-          ))}
+          ) : (
+            allData.map((data) => (
+              <Grid
+                item
+                xs={6}
+                sm={6}
+                md={4}
+                lg={3}
+                key={data._id}
+                className={classes.centerContent}
+              >
+                <Box
+                  sx={{ paddingY: "5%" }}
+                  onClick={() => handleClickOpen(data._id)}
+                >
+                  <LocationOnOutlinedIcon
+                    className={classes.locationIcon}
+                    sx={{ fontSize: "600%" }}
+                  />
+                  <Typography align='center'>{data.destinationName}</Typography>
+                </Box>
+              </Grid>
+            ))
+          )}
         </Grid>
         <hr
           style={{
@@ -131,6 +142,7 @@ const UserExplore = () => {
 
       {/* Dailouge */}
       <Dialog
+        transitionDuration={{ enter: 800, exit: 500 }}
         fullScreen
         open={open}
         onClose={handleClose}
@@ -327,7 +339,7 @@ const UserExplore = () => {
                     minWidth: "35vh",
                     minHeight: "auto",
                     maxWidth: "35vh",
-                    minHeight: "auto",
+                    maxHeight: "auto",
                   }}
                 />
                 <Typography
@@ -364,7 +376,7 @@ const UserExplore = () => {
                     minWidth: "35vh",
                     minHeight: "auto",
                     maxWidth: "35vh",
-                    minHeight: "auto",
+                    maxHeight: "auto",
                   }}
                 />
                 <Typography
@@ -402,7 +414,7 @@ const UserExplore = () => {
                     minWidth: "35vh",
                     minHeight: "auto",
                     maxWidth: "35vh",
-                    minHeight: "auto",
+                    maxHeight: "auto",
                   }}
                 />
                 <Typography

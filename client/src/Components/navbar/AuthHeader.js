@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import {
   AppBar,
+  Badge,
+  Box,
   Button,
+  IconButton,
+  Menu,
+  MenuItem,
   Tab,
   Tabs,
   Toolbar,
@@ -9,22 +14,37 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useStyles } from "./headerStyles";
 import DrawerComp from "./DrawerComp";
+import { ChatState } from "../../Context/ChatProvider";
 
 const AuthHeader = () => {
   const classes = useStyles();
+  const { notification, setNotification, setSelectedChat } = ChatState();
   const authorInfo = localStorage.getItem("authorInfo");
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("md"));
   console.log(isMatch);
   const [value, setValue] = useState(0);
   const navigate = useNavigate();
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
   const logout = () => {
     localStorage.removeItem("authorInfo");
     localStorage.removeItem("authorFirstname");
     localStorage.removeItem("authorId");
+    localStorage.removeItem("authorInfo2");
+
     navigate("/");
   };
   return (
@@ -112,6 +132,41 @@ const AuthHeader = () => {
                   to={"/author/profile"}
                 />
               </Tabs>
+
+              <Box>
+                <IconButton
+                  onClick={handleClick}
+                  size='large'
+                  sx={{ ml: 2, color: "white" }}
+                  // aria-controls={open ? "account-menu" : undefined}
+                  // aria-haspopup='true'
+                  // aria-expanded={open ? "true" : undefined}
+                >
+                  <Badge badgeContent={notification.length} color='error'>
+                    <NotificationsActiveIcon />
+                  </Badge>
+                </IconButton>
+                <Menu
+                  id='basic'
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                >
+                  {!notification.length && "No new messages"}
+                  {notification.map((notif) => (
+                    <MenuItem
+                      key={notif._id}
+                      onClick={() => {
+                        setSelectedChat(notif.chat);
+                        setNotification(
+                          notification.filter((n) => n !== notif)
+                        );
+                      }}
+                    >{`Message from ${notif.chat.users[0].firstName} ${notif.chat.users[0].lastName}`}</MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+
               <Button
                 sx={{ marginLeft: "auto" }}
                 variant='contained'

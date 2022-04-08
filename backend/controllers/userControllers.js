@@ -94,10 +94,25 @@ const userSignup = async (req, res) => {
       });
   }
 };
+const checkItemFavrites = asyncHandler(async (req, res) => {
+  const { id, userId } = req.body;
+  try {
+    const user = await userSchema.find({ _id: userId });
 
+    const isInArray = user[0].wishlistItems.some(function (item) {
+      return item.equals(id);
+    });
+    res.status(200).json({ postPresent: isInArray });
+  } catch (error) {
+    console.log("the error is ", error);
+    res.status(400).json({ message: "failed", error: error });
+  }
+});
 const addToWish = asyncHandler(async (req, res) => {
   const { postId, userId } = req.body;
   const user = await userSchema.find({ _id: userId });
+  // console.log(user);
+  // console.log(postId);
   const isInArray = user[0].wishlistItems.some(function (item) {
     return item.equals(postId);
   });
@@ -134,6 +149,33 @@ const addToWish = asyncHandler(async (req, res) => {
       });
   }
 });
+const getLikedItem = asyncHandler(async (req, res) => {
+  const userid = req.params.id;
+  let likedListIDS = [];
+  try {
+    await userSchema
+      .findById(userid)
+      .populate("likedItems")
+      .exec((err, data) => {
+        if (err) {
+          res.status(500).json({ message: "failed to get likeditems" });
+        } else {
+          for (x of data.likedItems) {
+            likedListIDS.push(x?._id);
+          }
+
+          res
+            .status(200)
+            .json({ message: data.likedItems, likedListIDS: likedListIDS });
+        }
+      });
+  } catch (error) {
+    console.log("the errror is ", error);
+    res
+      .status(400)
+      .json({ message: "failed to get wishlist items", error: error });
+  }
+});
 const getWishItem = asyncHandler(async (req, res) => {
   let wishlistIdS = [];
   const userid = req.params.id;
@@ -146,7 +188,7 @@ const getWishItem = asyncHandler(async (req, res) => {
         res.status(500).json({ message: "something wrong", error: err });
       } else {
         for (x of data.wishlistItems) {
-          wishlistIdS.push(x._id);
+          wishlistIdS.push(x?._id);
         }
 
         res
@@ -221,7 +263,7 @@ const premiumMember = async (req, res, next) => {
         idempotencyKey,
       }
     );
-    console.log("charge:", { charge });
+    // console.log("charge:", { charge });
     status = "success";
   } catch (error) {
     console.log("Error:::", error);
@@ -234,7 +276,7 @@ const premiumMember = async (req, res, next) => {
     //   else console.log(data);
     // })
     const user = await userSchema.findOne({ _id: userId });
-    console.log("user:", user);
+    // console.log("user:", user);
     const response = await userSchema.updateOne(
       { _id: userId },
       { premiumUser: true }
@@ -260,12 +302,12 @@ const allUsers = asyncHandler(async (req, res) => {
         ],
       }
     : {};
-    console.log("the search word is :", keyword);
+  // console.log("the search word is :", keyword);
 
   const authors = await authorSchema
     .find(keyword)
     .find({ _id: { $ne: req.user._id } });
- 
+
   res.send(authors);
 });
 
@@ -379,6 +421,71 @@ const getSingleExploreData = asyncHandler(async (req, res) => {
       .json({ message: "something wrong try again later", error: error });
   }
 });
+const postLike = asyncHandler(async (req, res) => {
+  const { postId, userId } = req.body;
+  try {
+    const user = await userSchema.findById(userId);
+    const isInArray = user.likedItems.some((item) => item.equals(postId));
+    console.log(user.likedItems)
+    console.log(postId)
+    console.log(isInArray)
+    if (isInArray) {
+      console.log("allredy liked post");
+      userSchema
+        .findByIdAndUpdate(userId, { $pull: { likedItems: postId } })
+        .exec()
+        .then(async (response) => {
+          await postModel.findByIdAndUpdate(postId, {
+            $inc: { likeCount: -1 },
+          });
+          res
+            .status(200)
+            .json({ message: "like removed", result: response, value: 0 });
+        })
+        .catch((err) => {
+          console.log("the error is ", err);
+          res
+            .status(400)
+            .json({ message: "failed to remove like", error: err });
+        });
+    } else {
+      console.log("post now liked");
+      userSchema
+        .findByIdAndUpdate(userId, { $addToSet: { likedItems: postId } })
+        .exec()
+        .then(async (response) => {
+          await postModel.findByIdAndUpdate(postId, { $inc: { likeCount: 1 } });
+          res
+            .status(200)
+            .json({ message: "post liked ...", response: response, value: 1 });
+        })
+        .catch((error) => {
+          console.log("the like post error is ", error);
+          res
+            .status(400)
+            .json({ message: "failed to like the post", error: error });
+        });
+    }
+  } catch (error) {
+    console.log("the error is:", error);
+    res.status(400).json({ message: "failed to like", error: error });
+  }
+});
+
+const checkPostLiked = asyncHandler(async(req,res)=>{
+  const {id, userId } = req.body;
+  try {
+    const user =await userSchema.findById(userId)
+    const isInArray = user.likedItems.some(function(item){
+      return item.equals(id)
+    })
+    console.log("user sideliked post is in array",isInArray)
+    res.status(200).json({postPresent:isInArray})
+  } catch (error) {
+    console.log("the error is :",error)
+    res.status(400).json({message:"failed",error:error})
+  }
+})
 module.exports = {
   getAllPost,
   userSignup,
@@ -393,6 +500,10 @@ module.exports = {
   updateProfile,
   getExploreData,
   getSingleExploreData,
+  checkItemFavrites,
+  postLike,
+  getLikedItem,
+  checkPostLiked,
   /////
   allUsers,
 };

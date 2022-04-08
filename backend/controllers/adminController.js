@@ -47,6 +47,16 @@ const allPreUsers = asynHandler(async (req, res) => {
     throw new Error(error);
   }
 });
+const allAuthorsPrint =asynHandler(async(req,res)=>{
+  try {
+    const data = await Author.find()
+    res.status(200).json(data);
+  } catch (error) {
+    console.log("the error is =>", error);
+    res.status(400);
+    throw new Error(error);
+  }
+})
 const allAuthors = asynHandler(async (req, res) => {
   try {
     let data = await Post.aggregate([
@@ -64,8 +74,11 @@ const allAuthors = asynHandler(async (req, res) => {
           as: "authorData",
         },
       },
+      {$unwind: '$authorData'},
     ]);
     res.status(200).json(data);
+    console.log(data)
+
   } catch (error) {
     console.log("the error is =>", error);
     res.status(400);
@@ -282,4 +295,5 @@ module.exports = {
   createExploreData,
   fetchExploreData,
   deleteExplorePost,
+  allAuthorsPrint
 };

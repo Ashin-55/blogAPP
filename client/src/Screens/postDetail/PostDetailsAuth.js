@@ -11,7 +11,7 @@ const PostDetail = () => {
   return (
     <div>
       <AuthHeader />
-      <SinglePost />
+      <SinglePost author={true}/>
       <FooterComp />
     </div>
   );

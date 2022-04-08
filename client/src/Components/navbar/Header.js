@@ -9,10 +9,13 @@ import {
   Toolbar,
   Typography,
   useMediaQuery,
-  useTheme,Box
+  useTheme,
+  Box,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import { styled } from "@mui/material/styles";
 
 import DrawerComp from "./DrawerComp";
@@ -20,13 +23,22 @@ import { useStyles } from "./headerStyles";
 import { ChatState } from "../../Context/ChatProvider";
 
 const Header = ({ premium }) => {
-  const { notification } = ChatState();
+  const { notification, setNotification, setSelectedChat } = ChatState();
   const classes = useStyles();
   const [value, setValue] = useState(0);
   const [useractive, setUseractive] = useState(false);
   const navigate = useNavigate();
   const theme = useTheme();
   const isMatch = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   const login = () => {
     navigate("/login");
@@ -121,15 +133,7 @@ const Header = ({ premium }) => {
                 {userInfo && (
                   <Tab
                     key={"message"}
-                    label={
-                      <Badge
-                        badgeContent={notification.length}
-                        color='error'
-                        showZero
-                      >
-                        Chat
-                      </Badge>
-                    }
+                    label={"Chat"}
                     component={Link}
                     to={"/chat"}
                   />
@@ -146,15 +150,36 @@ const Header = ({ premium }) => {
               {userInfo && (
                 <Box>
                   <IconButton
-                    // onClick={handleClick}
+                    onClick={handleClick}
                     size='large'
-                    sx={{ ml: 2 ,color:"white"}}
+                    sx={{ ml: 2, color: "white" }}
                     // aria-controls={open ? "account-menu" : undefined}
                     // aria-haspopup='true'
                     // aria-expanded={open ? "true" : undefined}
                   >
-                   <NotificationsActiveIcon/>
+                    <Badge badgeContent={notification.length} color='error'>
+                      <NotificationsActiveIcon />
+                    </Badge>
                   </IconButton>
+                  <Menu
+                    id='basic'
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                  >
+                    {!notification.length && "No new messages"}
+                    {notification.map((notif) => (
+                      <MenuItem
+                        key={notif._id}
+                        onClick={() => {
+                          setSelectedChat(notif.chat);
+                          setNotification(
+                            notification.filter((n) => n !== notif)
+                          );
+                        }}
+                      >{`Message from ${notif.chat.authers[0].firstName}${notif.chat.authers[0].lastName}`}</MenuItem>
+                    ))}
+                  </Menu>
                 </Box>
               )}
               {userInfo && (
