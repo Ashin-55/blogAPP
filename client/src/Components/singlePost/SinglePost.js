@@ -37,6 +37,13 @@ const SinglePost = ({ author }) => {
   const [Loading, setLoading] = useState(true);
   const [flag, setFlag] = useState(true);
   let { id } = useParams();
+  let authorInfo = localStorage.getItem("authorInfo")
+  console.log(authorInfo)
+  const config = {
+    headers: {
+      Authorization: `Bearer ${authorInfo}`,
+    },
+  };
 
   const wishlistHaandler = async (postId) => {
     const data = { postId, userId };
@@ -57,9 +64,9 @@ const SinglePost = ({ author }) => {
     let data;
     author ? (data = { postId, autherId }) : (data = { postId, userId });
     if (author) {
-      alert("auther")
+     
       if (autherId) {
-        const likeAuth = await axios.post("/author/likePost", data);
+        const likeAuth = await axios.post("/author/likePost", data,config);
         setFlag(!flag)
         toast(`${likeAuth.data.message}`, { type: "success", autoClose: 1000 });
       } else {
@@ -68,7 +75,7 @@ const SinglePost = ({ author }) => {
     } else {
       if (userId) {
 
-        console.log(data,"kkkkkk")
+        // console.log(data,"kkkkkk")
         const likeUser = await axios.post("/likePost", data);
         console.log("likeuser output",likeUser)
         if (likeUser.data.value == 0) {
@@ -85,12 +92,12 @@ const SinglePost = ({ author }) => {
   };
 
   const fetchData = async (id) => {
-    const postDetail = await axios.get(`/author/postDetail/${id}`);
+    const postDetail = await axios.get(`/author/postDetail/${id}`,config);
     setPostDetails(postDetail.data.postDetails);
     setLoading(false);
   };
   const checkLikedPosts = async (path,datas) => {
-    const likedPostorNot = await axios.post(path, datas);
+    const likedPostorNot = await axios.post(path, datas,config);
     setLikedItem(likedPostorNot.data.postPresent);
   };
   const checkWishListPost = async(path2,datas)=>{
@@ -170,6 +177,7 @@ const SinglePost = ({ author }) => {
                   backgroundColor: "white",
                   padding: "3%",
                   borderRadius: 5,
+                  marginTop:"2%"
                 }}
               >
                 {post.postTitle}

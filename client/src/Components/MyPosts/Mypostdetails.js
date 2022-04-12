@@ -34,7 +34,13 @@ const Mypostdetails = () => {
   const [edit, setEdit] = useState(false);
   const [refresh, setRefresh] = useState(true);
   const { id } = useParams();
+  const authorInfo = localStorage.getItem("authorInfo");
 
+  const config = {
+    headers: {
+      Authorization: `Bearer ${authorInfo}`,
+    },
+  };
   const deletePost = async (id) => {
     confirmAlert({
       title: "Are you sure to delete this post",
@@ -43,7 +49,7 @@ const Mypostdetails = () => {
         {
           label: "Yes",
           onClick: async () => {
-            const data = await axios.get(`/author/deletePost/${id}`);
+            const data = await axios.get(`/author/deletePost/${id}`, config);
             toast(`${data.data.message}`, { type: "success", autoClose: 1000 });
             navigate("/author/mypost");
           },
@@ -66,7 +72,7 @@ const Mypostdetails = () => {
   };
 
   const fetchdata = async () => {
-    const detailData = await axios.get(`/author/mypostDetail/${id}`);
+    const detailData = await axios.get(`/author/mypostDetail/${id}`, config);
     setPostDetails(detailData.data.mypostDetails);
     setLoading(false);
   };
@@ -198,7 +204,27 @@ const Mypostdetails = () => {
                     >
                       {postData.subTitle}
                     </Typography>
-                    <Typography className='postContent'>
+                    <Typography
+                      className='postContent'
+                      sx={{
+                        letterSpacing: "-0.03em",
+                        lineHeight: "38px",
+                        marginTop: "2em",
+                        fontStyle: "poppins",
+                        wordBreak: "break-word",
+                        color: "black",
+                        fontWeight: 400,
+                        display: "block",
+                        marginBlockStart: "1em",
+                        marginBlockEnd: "1em",
+                        marginInlineStart: "0px",
+                        marginInlineEnd: "0px",
+                        fontSize: "20px",
+                        backgroundColor: "white",
+                        borderRadius: 5,
+                        padding: "5%",
+                      }}
+                    >
                       {postData.postContent}
                     </Typography>
                   </CardContent>
@@ -208,6 +234,7 @@ const Mypostdetails = () => {
                       fontFamily: "Poppins",
                       fontWeight: "bolder",
                       padding: "5% 0 2% 0",
+                      textAlign: "center",
                     }}
                   >
                     Added Images

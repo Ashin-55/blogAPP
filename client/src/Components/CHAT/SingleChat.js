@@ -18,6 +18,7 @@ import { ChatState } from "../../Context/ChatProvider";
 import { getSender } from "../../ChatConfig/ChatLogic";
 import ScrollableChat from "./ScrollableChat";
 import "../../Components/styles.css";
+import SmileFace from "../animaton/SmileFace";
 
 const ENDPOINT = "http://localhost:3500";
 let authorToken, socket, selectedChatCompare;
@@ -39,8 +40,15 @@ const SingleChat = ({ fetchAgain, setFetchAgain, author }) => {
   const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
+    let authorDetail;
+    if (author) {
+      authorDetail = authorData
+        ? authorData
+        : JSON.parse(localStorage.getItem("authorInfo2"));
+    }
+
     socket = io(ENDPOINT);
-    author ? socket.emit("setup", authorData) : socket.emit("setup", user);
+    author ? socket.emit("setup", authorDetail) : socket.emit("setup", user);
     socket.on("connected", () => setSocketConnected(true));
     socket.on("typing", () => setIsTyping(true));
     socket.on("stop typing", () => setIsTyping(false));
@@ -173,7 +181,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain, author }) => {
             </IconButton>
             {author
               ? `${selectedChat.users[0].firstName} ${selectedChat.users[0].lastName}`
-              : `${selectedChat.authers[0].firstName}${selectedChat.authers[0].lastName}`}
+              : `${selectedChat.authers[0].firstName}  ${selectedChat.authers[0].lastName}`}
             {/* {selectedChat.authers[0].firstName.toUpperCase()} */}
           </Typography>
           <Box
@@ -184,7 +192,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain, author }) => {
               overflowY: "hidden",
               borderRadius: 3,
               flexDirection: "column",
-              background: "#E8E8E8",
+              background: "#ffffff",
               width: "100%",
               height: "100%",
             }}
@@ -235,7 +243,21 @@ const SingleChat = ({ fetchAgain, setFetchAgain, author }) => {
           <Typography
             sx={{ fontSize: 28, paddingBottom: 3, fontFamily: "Poppins" }}
           >
-            {author ? "Click any user to Chat" : "Click any author to Chat"}
+            {author ? (
+              <>
+                <SmileFace />
+                <span style={{ display: "flex", justifyContent: "center" }}>
+                  Click any user to Chat
+                </span>
+              </>
+            ) : (
+              <>
+                <SmileFace />
+                <span style={{ display: "flex", justifyContent: "center" }}>
+                  Click any author to Chat
+                </span>
+              </>
+            )}
           </Typography>
         </Box>
       )}

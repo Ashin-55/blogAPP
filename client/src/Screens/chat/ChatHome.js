@@ -49,8 +49,11 @@ const ChatHome = ({ author }) => {
     setLoading(false)
   };
   useEffect(() => {
-    let USERID = user ? user._id : localStorage.getItem("userId");
+    if(author){
+      setLoading(false)
+    }
     if (!author) {
+      let USERID = user ? user._id : localStorage.getItem("userId");
       checkPremiumUser(USERID);
     }
   

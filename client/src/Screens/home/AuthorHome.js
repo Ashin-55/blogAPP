@@ -10,6 +10,7 @@ const AuthorHomepage = () => {
   const navigate = useNavigate();
 
   const authorIfo = localStorage.getItem("authorInfo");
+ 
   useEffect(() => {
     if (!authorIfo) {
       navigate("/author/authorLogin");

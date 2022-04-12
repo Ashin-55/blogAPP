@@ -15,8 +15,8 @@ const ChatProvider = ({ children }) => {
     const authorInfo = JSON.parse(localStorage.getItem("authorInfo2"));
     setUser(userInfo2);
     setauthorData(authorInfo);
-    console.log("chat provider",authorInfo)
-    console.log("chat provider",userInfo2)
+    console.log("chat provider authorInfo",authorInfo)
+    console.log("chat provider userInfo2",userInfo2)
     // if (!userInfo2) {
     //   navigate("/");
     // }

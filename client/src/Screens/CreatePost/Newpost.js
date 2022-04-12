@@ -23,9 +23,15 @@ import { validationSchema } from "./validation";
 import GraphSkell from "../../skeleton/GraphSkell";
 
 let authorId;
-
+let authorInfo;
 const Newpost = ({ editpostid, setRefresh, refresh, setEdit }) => {
   authorId = localStorage.getItem("authorId")
+  authorInfo = localStorage.getItem("authorInfo")
+  const config = {
+    headers: {
+      Authorization: `Bearer ${authorInfo}`,
+    },
+  };
   const editPostId = editpostid;
   toast.configure();
   const navigate = useNavigate();
@@ -134,7 +140,7 @@ const Newpost = ({ editpostid, setRefresh, refresh, setEdit }) => {
       authorId: data.authorId,
       postid: editPostId,
     };
-    await axios.post("/author/editPost", postData).then((result) => {
+    await axios.post("/author/editPost", postData,config).then((result) => {
       setOpen(false);
       toast(" post updated successfully", { type: "success", autoClose: 2000 });
       setEdit(false);
@@ -159,7 +165,7 @@ const Newpost = ({ editpostid, setRefresh, refresh, setEdit }) => {
     };
 
     await axios
-      .post("/author/newpost", postData)
+      .post("/author/newpost", postData,config)
       .then((res) => {
         setOpen(false);
         console.log("post created successfull");
@@ -175,7 +181,7 @@ const Newpost = ({ editpostid, setRefresh, refresh, setEdit }) => {
 
   const fetchEditData = async (postid) => {
     setOpen(!open);
-    const { data } = await axios.get(`/author/editPost/${postid}`);
+    const { data } = await axios.get(`/author/editPost/${postid}`,config);
     setOpen(false);
     reset({
       mainTitle: data.postTitle,

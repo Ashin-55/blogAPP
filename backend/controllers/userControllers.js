@@ -8,6 +8,7 @@ const { OAuth2Client } = require("google-auth-library");
 require("dotenv");
 const { v4: uuidv4 } = require("uuid");
 const exploreDataModel = require("../model/exploreDataModel");
+const Activity = require("../model/activityLogModal");
 
 const googleClient = new OAuth2Client(
   "165983108609-ctvvdnt4am79qui5uakia5ikhtuj8k66.apps.googleusercontent.com"
@@ -340,6 +341,7 @@ const googleLogin = asyncHandler(async (req, res) => {
             firstName: user[0].firstName,
             lastName: user[0].lastName,
             email: user[0].email,
+            permission: user[0].status,
             token: genarateToken(user[0]._id),
           });
         } else {
@@ -422,13 +424,18 @@ const getSingleExploreData = asyncHandler(async (req, res) => {
   }
 });
 const postLike = asyncHandler(async (req, res) => {
-  const { postId, userId } = req.body;
+  const { postId, userId,ownerID } = req.body;
+  const datas = {
+    userId: userId,
+    postId: postId,
+    ownerID:ownerID
+  };
   try {
     const user = await userSchema.findById(userId);
     const isInArray = user.likedItems.some((item) => item.equals(postId));
-    console.log(user.likedItems)
-    console.log(postId)
-    console.log(isInArray)
+    console.log(user.likedItems);
+    console.log(postId);
+    console.log(isInArray);
     if (isInArray) {
       console.log("allredy liked post");
       userSchema
@@ -437,6 +444,12 @@ const postLike = asyncHandler(async (req, res) => {
         .then(async (response) => {
           await postModel.findByIdAndUpdate(postId, {
             $inc: { likeCount: -1 },
+          });
+           Activity.findOneAndDelete({postId:postId}, (err, data) => {
+            if (err) {
+              console.log("the activity log error is:", err);
+            }
+            console.log("the activity result is:", data);
           });
           res
             .status(200)
@@ -455,6 +468,12 @@ const postLike = asyncHandler(async (req, res) => {
         .exec()
         .then(async (response) => {
           await postModel.findByIdAndUpdate(postId, { $inc: { likeCount: 1 } });
+           Activity.create(datas, (err, data) => {
+            if (err) {
+              console.log("the activity log error is:", err);
+            }
+            console.log("the activity result is:", data);
+          });
           res
             .status(200)
             .json({ message: "post liked ...", response: response, value: 1 });
@@ -472,20 +491,20 @@ const postLike = asyncHandler(async (req, res) => {
   }
 });
 
-const checkPostLiked = asyncHandler(async(req,res)=>{
-  const {id, userId } = req.body;
+const checkPostLiked = asyncHandler(async (req, res) => {
+  const { id, userId } = req.body;
   try {
-    const user =await userSchema.findById(userId)
-    const isInArray = user.likedItems.some(function(item){
-      return item.equals(id)
-    })
-    console.log("user sideliked post is in array",isInArray)
-    res.status(200).json({postPresent:isInArray})
+    const user = await userSchema.findById(userId);
+    const isInArray = user.likedItems.some(function (item) {
+      return item.equals(id);
+    });
+    console.log("user sideliked post is in array", isInArray);
+    res.status(200).json({ postPresent: isInArray });
   } catch (error) {
-    console.log("the error is :",error)
-    res.status(400).json({message:"failed",error:error})
+    console.log("the error is :", error);
+    res.status(400).json({ message: "failed", error: error });
   }
-})
+});
 module.exports = {
   getAllPost,
   userSignup,

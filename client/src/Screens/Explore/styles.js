@@ -2,6 +2,10 @@ import { makeStyles } from "@material-ui/styles";
 
 export const useStyles = makeStyles((theme) => ({
   centerContent: {
+    // display: "flex",
+    // justifyContent: "center",
+  },
+  mainHeading: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",

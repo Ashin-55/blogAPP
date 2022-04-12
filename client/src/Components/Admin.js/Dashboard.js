@@ -22,13 +22,11 @@ import GraphSkell from "../../skeleton/GraphSkell";
 import PostDetailsSkeloton from "../../skeleton/PostDetailsSkeloton";
 import { useNavigate } from "react-router-dom";
 
-
-
 const useStyle = makeStyles({
   cardHover: {
     cursor: "pointer",
     "&:hover": {
-      background: "#d8e4ed",
+      background: "#a2d4f5",
     },
   },
 });
@@ -85,7 +83,7 @@ const Dashboard = () => {
   const data01 = [
     { name: "premium users", value: count.premiumUser },
     { name: "Normal Users", value: count.normalUser },
-    { name: "Total Users", value: (count.normalUser+count.premiumUser) },
+    { name: "Total Users", value: count.normalUser + count.premiumUser },
   ];
   useEffect(() => {
     !adminInfo && navigate("/admin/login");
@@ -97,8 +95,8 @@ const Dashboard = () => {
   return (
     <Container sx={{ paddingBottom: "4%" }}>
       {Loading ? (
-        <Grid container spacing={2} >
-          <Grid item sm={12} md={12} lg={12} align='center'>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={12} md={12} lg={12} align='center'>
             <GraphSkell />
           </Grid>
           <Grid item sm={6} md={12}>
@@ -106,8 +104,8 @@ const Dashboard = () => {
           </Grid>
         </Grid>
       ) : (
-        <Grid container spacing={2} sx={{backgroundColor:"whitesmoke"}} >
-          <Grid item sm={12} md={6} lg={6} align="center">
+        <Grid container spacing={2} sx={{ backgroundColor: "whitesmoke" }}>
+          <Grid item sm={12} md={6} lg={6} align='center'>
             <PieChart width={250} height={270}>
               <Pie
                 dataKey='value'
@@ -120,21 +118,24 @@ const Dashboard = () => {
 
               <Tooltip />
             </PieChart>
-            <Typography sx={{fontSize:"10px"}}>
-              <span>Total:{count.premiumUser}{" "}</span>
-              <span>Normal User:{count.normalUser}{" "}</span>
-              <span>Premium User:{count.premiumUser+count.normalUser}{" "}</span>
+            <Typography sx={{ fontSize: "10px" }}>
+              <span>Total:{count.premiumUser} </span>
+              <span>Normal User:{count.normalUser} </span>
+              <span>Premium User:{count.premiumUser + count.normalUser} </span>
             </Typography>
-            <Typography sx={{fontWeight:"bold"}}>Users Count</Typography>
+            <Typography sx={{ fontWeight: "bold" }}>Users Count</Typography>
           </Grid>
-          <Grid item sm={12} md={6} lg={6} align='center'>
+          <Grid item xs={12} sm={12} md={6} lg={6} align='center'>
             <Card
               sx={{
                 maxWidth: "50%",
                 paddingTop: "10%",
-                border: 1,
-                borderColor: "primary",
                 borderRadius: "5%",
+                boxShadow: 2,
+                "&:hover": {
+                  boxShadow: 5,
+                },
+                backgroundColor:"lightskyblue"
               }}
               className={classes.cardHover}
             >
@@ -142,7 +143,11 @@ const Dashboard = () => {
                 <Typography
                   align='center'
                   variant='h4'
-                  sx={{ paddingBottom: "6%", paddingTop: "1%" }}
+                  sx={{
+                    paddingBottom: "6%",
+                    paddingTop: "1%",
+    
+                  }}
                 >
                   Most Active Author
                 </Typography>
@@ -170,7 +175,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item sm={6} md={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Typography align='center' variant='h5' sx={{ marginTop: "3%" }}>
               New Users
             </Typography>
@@ -214,7 +219,7 @@ const Dashboard = () => {
               </TableBody>
             </Table>
           </Grid>
-          <Grid item sm={6} md={12}>
+          <Grid item xs={12} sm={12} md={12}>
             <Typography align='center' variant='h5' sx={{ marginTop: "3%" }}>
               Recent Post
             </Typography>

@@ -15,7 +15,7 @@ const ChatBox = ({ fetchAgain, setFetchAgain,author }) => {
         flexDirection: "column",
         padding: 3,
         marginX:1,
-        background: "grey",
+        background: "#c5d8ec",
         width: { xs: "100%", sm: "100%", md: "58%" },
         borderRadius: 2,
         borderWidth: "2px",

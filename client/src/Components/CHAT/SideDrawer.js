@@ -3,7 +3,6 @@ import {
   Tooltip,
   Button,
   Drawer,
-  Menu,
   Typography,
   ListItemButton,
   ListItemIcon,
@@ -11,19 +10,14 @@ import {
   List,
   TextField,
   CircularProgress,
-  MenuList,
-  MenuItem,
-  Badge,
 } from "@mui/material";
 import React, { useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
-import { ChatState } from "../../Context/ChatProvider";
-import { typography } from "@mui/system";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import { ChatState } from "../../Context/ChatProvider";
 import Chatloading from "../../skeleton/Chatloading";
 import UserListItem from "../ChatUserlistItem/UserListItem";
 import { getSender } from "../../ChatConfig/ChatLogic";

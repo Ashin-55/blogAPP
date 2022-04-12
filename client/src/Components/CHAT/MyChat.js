@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import { ChatState } from "../../Context/ChatProvider";
 import Chatloading from "../../skeleton/Chatloading";
-import { getSender } from "../../ChatConfig/ChatLogic";
 
 let authorToken;
 const MyChat = ({ fetchAgain, author }) => {
@@ -20,7 +19,7 @@ const MyChat = ({ fetchAgain, author }) => {
       };
       const url = author ? "/api/chat/author" : "/api/chat";
       const { data } = await axios.get(url, config);
-      console.log("the servver output", data);
+      // console.log("the servver output", data);
       setChats(data);
     } catch (error) {
       console.log("the error is ::", error);
@@ -42,7 +41,7 @@ const MyChat = ({ fetchAgain, author }) => {
           md: "flex",
         },
         borderRadius: 2,
-        background: "grey",
+        background: "#c5d8ec",
         borderWidth: "1px",
         flexDirection: "column",
         alignItems: "center",
@@ -70,13 +69,27 @@ const MyChat = ({ fetchAgain, author }) => {
           padding: "4%",
           width: "100%",
           height: "100%",
-          backgroundColor: "#F8F8F8",
+          backgroundColor: "#ffffff",
           borderRadius: 3,
           overflow: "hidden",
         }}
       >
         {chats ? (
           <Stack overflow='scroll'>
+            {chats.length === 0 && (
+              <span
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  marginTop: "25%",
+                  fontSize: "25px",
+                }}
+              >
+                {" "}
+                {!author?("make chat with new authors..."):("  wait until any users message you.....")}
+               
+              </span>
+            )}
             {chats.map((chat) => (
               <Box
                 onClick={() => {
@@ -97,7 +110,7 @@ const MyChat = ({ fetchAgain, author }) => {
                 <Typography>
                   {author
                     ? `${chat.users[0].firstName} ${chat.users[0].lastName}`
-                    : `${chat.authers[0].firstName}${chat.authers[0].lastName}`}
+                    : `${chat.authers[0].firstName}  ${chat.authers[0].lastName}`}
                   {/* {
                     console.log(chat),
                     console.log(chat.users.length),

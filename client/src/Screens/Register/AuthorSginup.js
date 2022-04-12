@@ -26,14 +26,22 @@ const AuthorSginup = ({
   address1,
   city1,
   state1,
-  indroduction1,refresh,setRefresh,setEdit
+  indroduction1,
+  refresh,
+  setRefresh,
+  setEdit,
 }) => {
   toast.configure();
   const editProfileid = editProfileId;
   const classes = useStyle();
   const navigate = useNavigate();
   const autherPresent = localStorage.getItem("authorInfo");
-  const [editData, setEditData] = useState({});
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${autherPresent}`,
+    },
+  };
 
   const INTIAL_FORM_STATE_EDIT = {
     firstName: firstName1,
@@ -56,16 +64,22 @@ const AuthorSginup = ({
       city: values.city,
       state: values.state,
       indroduction: values.indroduction,
-      authorId:editProfileId
+      authorId: editProfileId,
     };
-    axios.post("/author/editProfile",newData).then((res)=>{
-      toast("profile Details updated successfully", { type: "success" ,autoClose:3000});
-      setEdit(false)
-      setRefresh(!refresh)
-    }).catch((error)=>{
-      console.log("the error is =>",error)
-      toast("Updation Failed ,Try Again", { type: "error" ,autoClose:3000});
-    })
+    axios
+      .post("/author/editProfile", newData, config)
+      .then((res) => {
+        toast("profile Details updated successfully", {
+          type: "success",
+          autoClose: 3000,
+        });
+        setEdit(false);
+        setRefresh(!refresh);
+      })
+      .catch((error) => {
+        console.log("the error is =>", error);
+        toast("Updation Failed ,Try Again", { type: "error", autoClose: 3000 });
+      });
   };
 
   const handleSubmit = async (values) => {
@@ -84,12 +98,18 @@ const AuthorSginup = ({
     axios
       .post("/author/authorSignup", registerData)
       .then((response) => {
-        toast("request sent successfully", { type: "success" ,autoClose:3000});
-        navigate("/author/authorSignup");
+        toast("request sent successfully", {
+          type: "success",
+          autoClose: 3000,
+        });
+        navigate("/author/authorLogin");
       })
       .catch((err) => {
         console.log(err);
-        toast("email or Mobile number is allready used", { type: "error",autoClose:3000 });
+        toast("email or Mobile number is allready used", {
+          type: "error",
+          autoClose: 3000,
+        });
       });
   };
 
@@ -121,7 +141,6 @@ const AuthorSginup = ({
               validationSchema={
                 editProfileid ? FORM_VALIDATION_EDIT : FORM_VALIDATION
               }
-             
               onSubmit={editProfileid ? handleEdit : handleSubmit}
             >
               <Form>

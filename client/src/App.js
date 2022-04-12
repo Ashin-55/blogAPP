@@ -29,6 +29,8 @@ import UserExplore from "./Screens/Explore/UserExplore";
 import ViewAuthorPost from "./Screens/Admin/ViewAuthorPost";
 import AddExplore from "./Screens/Admin/AddExplore";
 import AllExploreData from "./Screens/Admin/AllExploreData";
+import Notfound from "./Components/animaton/Notfound";
+import Activity from "./Screens/Activity/Activity";
 function App() {
   return (
     <Routes>
@@ -51,6 +53,7 @@ function App() {
       <Route path='/explore' element={<UserExplore />} />
       <Route path='/authorDetails/:id' element={<AuthorDetails />} />
       <Route path='/postDetail/:id' element={<PostDetail />} />
+      <Route path='/chat' element={<ChatHome />} />
 
       <Route path='/author/authorSignup' element={<AuthorSignup />} />
       <Route path='/author/authorLogin' element={<AuthorLogin />} />
@@ -60,10 +63,13 @@ function App() {
       <Route path='/author/mypost' element={<OwnPost />} />
       <Route path='/author/mypostDetail/:id' element={<OwnPostDetail />} />
       <Route path='/author/profile' element={<Profile />} />
+      <Route path='/author/activity' element={<Activity />} />
+      <Route path='/author/explore' element={<UserExplore author={true} />} />
+      <Route path='/author/chat' element={<ChatHome author={true}/>} />
       {/* <Route path='/author/editProfile/:id' element={<EditAuth />} /> */}
 
-      <Route path='/chat' element={<ChatHome />} />
-      <Route path='/author/chat' element={<ChatHome author={true}/>} />
+
+      <Route path="*" element={<Notfound/>}/>
     </Routes>
   );
 }

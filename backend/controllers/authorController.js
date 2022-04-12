@@ -5,6 +5,7 @@ const authorSchema = require("../model/authorModel");
 const postSchema = require("../model/postModel");
 const generateToken = require("../utils/generateToken");
 const { cloudinary } = require("../utils/cloudinary");
+const Activity = require("../model/activityLogModal");
 
 const authSignup = asyncHandler(async (req, res) => {
   const data = req.body;
@@ -58,7 +59,6 @@ const createPost = asyncHandler(async (req, res) => {
     const imagefour = { image4: data.image4 };
     const imagefive = { image5: data.image5 };
 
-   
     const respose1 = await cloudinary.uploader.upload(imageone.image1);
     const respose2 = await cloudinary.uploader.upload(imagetwo.image2);
     const respose3 = await cloudinary.uploader.upload(imagethree.image3);
@@ -79,7 +79,7 @@ const createPost = asyncHandler(async (req, res) => {
       image4: respose4.secure_url,
       image5: respose5.secure_url,
     };
- 
+
     const postResponse = await postSchema.create(details);
     // console.log(postResponse);
     res.status(200).json({ message: "post created succesfully" });
@@ -167,7 +167,7 @@ const myPostDetails = asyncHandler(async (req, res) => {
 
 const profileData = asyncHandler(async (req, res) => {
   const autherId = req.params.id;
-  console.log(autherId)
+  console.log(autherId);
   try {
     const profile = await authorSchema.find({
       _id: mongoose.Types.ObjectId(autherId),
@@ -208,7 +208,12 @@ const getAuthorData = async (req, res) => {
   }
 };
 const likePost = asyncHandler(async (req, res) => {
-  const { postId, autherId } = req.body;
+  const { postId, autherId, ownerID } = req.body;
+  const datas = {
+    authorId: autherId,
+    postId: postId,
+    ownerID: ownerID,
+  };
   const author = await authorSchema.findById(autherId);
   const isInArray = author.likedItems.some((item) => item.equals(postId));
   if (isInArray) {
@@ -218,11 +223,21 @@ const likePost = asyncHandler(async (req, res) => {
       .exec()
       .then(async (response) => {
         await postSchema.findByIdAndUpdate(postId, { $inc: { likeCount: -1 } });
-        res.status(200).json({ message: "like removed", result: response });
+        Activity.findOneAndDelete({ postId: postId }, (err, data) => {
+          if (err) {
+            console.log("the activity log error is:", err);
+          }
+          console.log("the activity result is:", data);
+        });
+        res
+          .status(200)
+          .json({ message: "like removed", result: response, value: -1 });
       })
       .catch((error) => {
         console.log(error);
-        res.status(500).json({ message:"failed to remove like",error: error });
+        res
+          .status(500)
+          .json({ message: "failed to remove like", error: error });
       });
   } else {
     console.log("not liked post");
@@ -231,7 +246,15 @@ const likePost = asyncHandler(async (req, res) => {
       .exec()
       .then(async (response) => {
         await postSchema.findByIdAndUpdate(postId, { $inc: { likeCount: 1 } });
-        res.status(200).json({ message: "post liked", result: response });
+        Activity.create(datas, (err, data) => {
+          if (err) {
+            console.log("the activity log error is:", err);
+          }
+          console.log("the activity result is:", data);
+        });
+        res
+          .status(200)
+          .json({ message: "post liked", result: response, value: 1 });
       })
       .catch((error) => {
         console.log("the error is =>", error);
@@ -354,21 +377,70 @@ const editProfile = asyncHandler(async (req, res) => {
   }
 });
 
-const checkPostLiked = asyncHandler(async(req,res)=>{
-  const {id, autherId } = req.body;
+const checkPostLiked = asyncHandler(async (req, res) => {
+  const { id, autherId } = req.body;
   try {
-    const author =await authorSchema.findById(autherId)
-    console.log(author)
-    const isInArray = author.likedItems.some(function(item){
-      return item.equals(id)
-    })
-    console.log("author sideliked post is in array",isInArray)
-    res.status(200).json({postPresent:isInArray})
+    const author = await authorSchema.findById(autherId);
+    console.log(author);
+    const isInArray = author.likedItems.some(function (item) {
+      return item.equals(id);
+    });
+    console.log("author sideliked post is in array", isInArray);
+    res.status(200).json({ postPresent: isInArray });
   } catch (error) {
-    console.log("the error is :",error)
-    res.status(400).json({message:"failed",error:error})
+    console.log("the error is :", error);
+    res.status(400).json({ message: "failed", error: error });
   }
-})
+});
+const getLikedPostId = asyncHandler(async (req, res) => {
+  const authorid = req.params.id;
+  let likedListIDS = [];
+  try {
+    await authorSchema
+      .findById(authorid)
+      .populate("likedItems")
+      .exec((err, data) => {
+        if (err) {
+          console.log("error is:", err);
+          res.status(500).json({
+            message: "failed to get likeditems",
+            likedListIDS: likedListIDS,
+          });
+        } else {
+          for (x of data.likedItems) {
+            likedListIDS.push(x?._id);
+          }
+
+          res
+            .status(200)
+            .json({ message: data.likedItems, likedListIDS: likedListIDS });
+        }
+      });
+  } catch (error) {
+    console.log("the errror is ", error);
+    res.status(400).json({
+      message: "failed to get wishlist items",
+      error: error,
+      likedListIDS: likedListIDS,
+    });
+  }
+});
+const getActivityDetails = asyncHandler(async (req, res) => {
+  const authorId = req.author._id;
+  try {
+    const datas = await Activity.find({ ownerID: authorId })
+      .populate("userId", "-password")
+      .populate("postId")
+      .populate("authorId", "-password")
+      .sort({ createdAt: -1 });
+    res.status(200).json(datas);
+  } catch (error) {
+    console.log("the activity error is:", error);
+    res
+      .status(500)
+      .json({ message: "failed to get activity log", error: error });
+  }
+});
 module.exports = {
   authSignup,
   authLogin,
@@ -385,5 +457,7 @@ module.exports = {
   getEditPostData,
   editPost,
   editProfile,
-  checkPostLiked
+  checkPostLiked,
+  getLikedPostId,
+  getActivityDetails,
 };

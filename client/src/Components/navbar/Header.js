@@ -77,9 +77,10 @@ const Header = ({ premium }) => {
                 sx={{
                   fontWeight: "bold",
                   paddingRight: "10%",
-                  fontSize: 20,
+                  fontSize: 15,
                   color: "white",
                   textDecoration: "none",
+                  fontFamily:"-moz-initial"
                 }}
               >
                 Be on the ROAD
@@ -95,12 +96,13 @@ const Header = ({ premium }) => {
                   fontWeight: "bold",
                   paddingRight: "1%",
                   paddingLeft: ".5%",
-                  fontSize: 20,
+                  fontSize: 15,
                   color: "white",
                   textDecoration: "none",
+                  fontFamily:"-moz-initial"
                 }}
               >
-                Be on the ROAD
+                Be On The ROAD
               </Typography>
               <Tabs
                 sx={{ marginLeft: "10px" }}
@@ -148,7 +150,7 @@ const Header = ({ premium }) => {
                 )}
               </Tabs>{" "}
               {userInfo && (
-                <Box>
+                <Box sx={{ marginLeft: "auto" }}>
                   <IconButton
                     onClick={handleClick}
                     size='large'
@@ -167,7 +169,9 @@ const Header = ({ premium }) => {
                     open={open}
                     onClose={handleClose}
                   >
-                    {!notification.length && "No new messages"}
+                    {!notification.length && (
+                      <span style={{ padding: `10px` }}> No new messages </span>
+                    )}
                     {notification.map((notif) => (
                       <MenuItem
                         key={notif._id}
@@ -186,7 +190,7 @@ const Header = ({ premium }) => {
                 <Button
                   variant='outlined'
                   color='warning'
-                  sx={{ marginLeft: "auto", marginRight: "1%" }}
+                  sx={{ marginRight: "1%" }}
                   onClick={premiumHandler}
                 >
                   Premium

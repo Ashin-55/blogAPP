@@ -43,7 +43,8 @@ const UserLogin = () => {
           toast("Login successfull", { type: "success",autoClose:2000 });
           navigate("/");
         } else {
-          toast(result.data.message, { type: "error" });
+          console.log(result)
+          toast("permission to access is blocked by admin :(", { type: "warning" });
         }
       })
       .catch((error) => {

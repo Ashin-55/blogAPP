@@ -105,9 +105,8 @@ const AuthorLogin = () => {
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
-                    <Typography sx={{ mx: "auto" }}>
-                      <Link to='/'> Back</Link>
-                      {"\u00A0"} to home
+                    <Typography align='right'>
+                      <Link to='/'> Home</Link>
                     </Typography>
                   </Grid>
                 </Grid>

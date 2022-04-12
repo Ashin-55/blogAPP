@@ -33,6 +33,7 @@ const BodyContent = ({ author }) => {
   const [allPost, setAllPost] = useState([]);
   const [favPostId, setFavPostId] = useState([]);
   const [likedPostId, setLikedPostId] = useState([]);
+  const [likedPostIdAuth, setLikedPostIdAuth] = useState([]);
   const [Loading, setLoading] = useState(true);
   const [flag, setFlag] = useState(true);
 
@@ -41,6 +42,13 @@ const BodyContent = ({ author }) => {
   const userInfo = localStorage.getItem("userInfo");
   const userId = localStorage.getItem("userId");
   const autherId = localStorage.getItem("authorId");
+  const authorIfo = localStorage.getItem("authorInfo");
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${authorIfo}`,
+    },
+  };
 
   const postDetailHandler = (id) => {
     author
@@ -66,13 +74,20 @@ const BodyContent = ({ author }) => {
     }
   };
 
-  const likeHandler = async (postId) => {
+  const likeHandler = async (postId,ownerID) => {
     let data;
     const indexx = likedPostId.indexOf(postId);
-    author ? (data = { postId, autherId }) : (data = { postId, userId });
+    const index2 = likedPostIdAuth.indexOf(postId);
+    author ? (data = { postId, autherId, ownerID}) : (data = { postId, userId,ownerID });
     if (author) {
       if (autherId) {
-        const likeAuth = await axios.post("/author/likePost", data);
+        const likeAuth = await axios.post("/author/likePost", data, config);
+        if (likeAuth.data.value == 1) {
+          likedPostIdAuth.push(postId);
+        } else {
+          likedPostIdAuth.splice(index2, 1);
+        }
+        setFlag(!flag);
         toast(`${likeAuth.data.message}`, { type: "success", autoClose: 1000 });
       } else {
         toast("Can't add !! login first", { type: "error", autoClose: 1000 });
@@ -85,6 +100,7 @@ const BodyContent = ({ author }) => {
         } else {
           likedPostId.splice(indexx, 1);
         }
+        setFlag(!flag);
         toast(`${likeUser.data.message}`, { type: "success", autoClose: 1000 });
       } else {
         toast("Can't add !! login first", { type: "error", autoClose: 1000 });
@@ -98,7 +114,7 @@ const BodyContent = ({ author }) => {
       let getData = [];
       try {
         author
-          ? (getData = await axios.get(`/author/home/${autherId}`))
+          ? (getData = await axios.get(`/author/home/${autherId}`, config))
           : (getData = await axios.get("/home"));
 
         setAllPost(getData.data.allPost);
@@ -118,6 +134,15 @@ const BodyContent = ({ author }) => {
         setLikedPostId(likedId.data.likedListIDS);
         setFavPostId(items.data.wishlistIdS);
       })(userId);
+    }
+    if (author) {
+      let AUTHORID = autherId
+        ? autherId
+        : JSON.parse(localStorage.getItem("authorInfo2"))._id;
+      (async (id) => {
+        const likedId = await axios.get(`/author/getLikedList/${id}`, config);
+        setLikedPostIdAuth(likedId.data.likedListIDS);
+      })(AUTHORID);
     }
   }, []);
 
@@ -168,8 +193,8 @@ const BodyContent = ({ author }) => {
               sx={{
                 minHeight: "85%",
                 maxHeight: "85%",
-                maxWidth: "70%",
-                minWidth: "70%",
+                maxWidth: "71%",
+                minWidth: "71%",
                 boxShadow: 1,
                 "&:hover": {
                   boxShadow: 6,
@@ -184,11 +209,7 @@ const BodyContent = ({ author }) => {
                     {post.authorId.firstName.substring(0, 1)}
                   </Avatar>
                 }
-                action={
-                  <IconButton aria-label='settings'>
-                    <MoreVertIcon />
-                  </IconButton>
-                }
+               
                 title={`${post.authorId.firstName}  ${post.authorId.lastName}`}
                 subheader={moment(post.createdAt).fromNow()}
               />
@@ -204,7 +225,7 @@ const BodyContent = ({ author }) => {
                   className={classes.title}
                   sx={{ fontWeight: "bold" }}
                 >
-                  {post.postTitle.substring(0, 60)}..
+                  {post.postTitle.substring(0, 54)}..
                 </Typography>
                 <Typography
                   className={classes.subtitle}
@@ -242,17 +263,27 @@ const BodyContent = ({ author }) => {
                 <IconButton
                   aria-label='like'
                   onClick={() => {
-                    likeHandler(post._id);
-                    setFlag(!flag);
+                    likeHandler(post._id,post.authorId);
+                    // setFlag(!flag);
                   }}
                 >
-                  <ThumbUpIcon
-                    style={
-                      likedPostId.indexOf(post._id) >= 0
-                        ? { color: "blue" }
-                        : { color: null }
-                    }
-                  />
+                  {author ? (
+                    <ThumbUpIcon
+                      style={
+                        likedPostIdAuth.indexOf(post._id) >= 0
+                          ? { color: "blue" }
+                          : { color: null }
+                      }
+                    />
+                  ) : (
+                    <ThumbUpIcon
+                      style={
+                        likedPostId.indexOf(post._id) >= 0
+                          ? { color: "blue" }
+                          : { color: null }
+                      }
+                    />
+                  )}
                 </IconButton>
               </CardActions>
             </Card>

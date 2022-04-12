@@ -122,10 +122,12 @@ export default function AllusersList() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          marginBottom:"10px",
+        
         }}
       >
         <Typography variant='h4'>All users</Typography>
-        <Button variant='contained' onClick={generatePDF}>
+        <Button size="small" variant='contained' onClick={generatePDF}>
           Download Report
         </Button>
       </Box>

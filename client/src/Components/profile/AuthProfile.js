@@ -15,14 +15,20 @@ const AuthProfile = () => {
   const [edit, setEdit] = useState(false);
   const [Loading, setLoading] = useState(true);
   const [refresh, setRefresh] = useState(false);
-
+  const authorInfo = localStorage.getItem("authorInfo")
+  
+  const config = {
+    headers: {
+      Authorization: `Bearer ${authorInfo}`,
+    },
+  };
 
   const editProfileHandler = (id) => {
     setEditProfileid(id);
     setEdit(true);
   };
   const fetchDetails = async (id) => {
-    const profileData = await axios.get(`/author/profile/${id}`);
+    const profileData = await axios.get(`/author/profile/${id}`,config);
     setProfileData(profileData.data.profileData);
     setLoading(false);
   };
@@ -82,7 +88,7 @@ const AuthProfile = () => {
                   backgroundColor: "whitesmoke",
                 }}
               >
-                <div className={classes.proImageContainer}>
+                <Box className={classes.proImageContainer}>
                   <Typography
                     className={classes.profile}
                     component='img'
@@ -92,7 +98,7 @@ const AuthProfile = () => {
                     height='auto'
                     sx={{ paddingBottom: "3%" }}
                   />
-                </div>
+                </Box>
                 <Typography
                   className={classes.title}
                   sx={{ fontWeight: "bold" }}

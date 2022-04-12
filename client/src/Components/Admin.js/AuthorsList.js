@@ -56,6 +56,7 @@ export default function PreUsers() {
   };
 
   const viewButtonHandler = (id) => {
+    alert("j")
     navigate(`/admin/authorPost/${id}`);
   };
   const generatePDF = () => {
@@ -75,7 +76,7 @@ export default function PreUsers() {
 
   React.useEffect(() => {
     console.log(adminInfo);
-    // !adminInfo && navigate("/admin/login");
+    !adminInfo && navigate("/admin/login");
     adminInfo && fetchAllUser();
   }, []);
   rows = data;
@@ -89,10 +90,11 @@ export default function PreUsers() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          marginBottom:"10px",
         }}
       >
         <Typography variant='h4'>All Author </Typography>
-        <Button variant='contained' onClick={generatePDF}>
+        <Button size="small" variant='contained' onClick={generatePDF}>
           Download Report
         </Button>
       </Box>
@@ -135,7 +137,7 @@ export default function PreUsers() {
               <StyledTableCell align='center'>
                 <Button
                   onClick={() => {
-                    viewButtonHandler(row.authorData[0]._id);
+                    viewButtonHandler(row.authorData._id);
                   }}
                 >
                   View

@@ -14,11 +14,12 @@ import {
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import Avatar from "@mui/material/Avatar";
 import { red } from "@mui/material/colors";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import Skeloton from "../../skeleton/Skeloton";
+import EmptyAnimation from "../animaton/EmptyAnimation";
 
 export default function WishlistComp({ author }) {
   toast.configure();
@@ -38,7 +39,7 @@ export default function WishlistComp({ author }) {
     const wishRes = await axios.post("/wishlist", data);
     console.log(wishRes);
 
-    toast(`${wishRes.data.message}`, { type: "success",autoClose:1000 });
+    toast(`${wishRes.data.message}`, { type: "success", autoClose: 1000 });
     setFlag(!flag);
   };
   React.useEffect(() => {
@@ -72,6 +73,19 @@ export default function WishlistComp({ author }) {
         </Grid>
       ) : (
         <Grid container sx={{ marginY: "3%", minHeight: "50vh" }} spacing={2}>
+          <Grid item xs={12}>
+            {favPost.length === 0 && (
+              <>
+                <Typography align='center'>
+                  You dont have any Favorite Post
+                  <Link style={{ textDecoration: "none" }} to='/'>
+                    {"  "}SEE POSTS
+                  </Link>
+                </Typography>
+                <EmptyAnimation />
+              </>
+            )}
+          </Grid>
           {favPost.map((details, index) => (
             <Grid item xs={12} md={6} key={index}>
               <Card sx={{ maxWidth: 345, borderRadius: "5%", boxShadow: 5 }}>

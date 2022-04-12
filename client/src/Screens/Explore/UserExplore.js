@@ -2,16 +2,11 @@ import React, { useEffect } from "react";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import {
   AppBar,
-  Button,
   CardMedia,
   Container,
   Dialog,
-  Divider,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
   Slide,
   Toolbar,
   Typography,
@@ -26,11 +21,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import GraphSkell from "../../skeleton/GraphSkell";
+import AuthHeader from "../../Components/navbar/AuthHeader";
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction='up' ref={ref} {...props} />;
 });
 
-const UserExplore = () => {
+const UserExplore = ({ author }) => {
   toast.configure();
   const classes = useStyles();
   const [allData, setAllData] = React.useState([]);
@@ -68,13 +64,13 @@ const UserExplore = () => {
   }, []);
   return (
     <>
-      <Header />
+      {author ? <AuthHeader /> : <Header />}
       <Container>
         <Grid container>
           <Grid
             item
             xs={12}
-            className={classes.centerContent}
+            className={classes.mainHeading}
             sx={{ paddingBottom: "8%" }}
           >
             <Typography variant='h2'>TRAVEL TIPS</Typography>
@@ -82,7 +78,7 @@ const UserExplore = () => {
           <Grid
             item
             xs={12}
-            className={classes.centerContent}
+            className={classes.mainHeading}
             sx={{ paddingBottom: "4%" }}
           >
             <Typography variant='h5'>Destinations</Typography>
@@ -90,7 +86,7 @@ const UserExplore = () => {
           <Grid
             item
             xs={12}
-            className={classes.centerContent}
+            className={classes.mainHeading}
             sx={{ paddingY: "5%" }}
           >
             <Typography align='center' sx={{ fontSize: 25 }}>
@@ -114,7 +110,7 @@ const UserExplore = () => {
                 md={4}
                 lg={3}
                 key={data._id}
-                className={classes.centerContent}
+                className={classes.mainHeading}
               >
                 <Box
                   sx={{ paddingY: "5%" }}
@@ -163,39 +159,51 @@ const UserExplore = () => {
             </Typography>
           </Toolbar>
         </AppBar>
-        <Container>
+        <Container
+          sx={{
+            backgroundColor: "wheat",
+            marginY: "2%",
+            borderRadius: 5,
+            padding: "2% 5%",
+          }}
+        >
           <Grid container>
             <Grid
               item
               xs={12}
-              className={classes.centerContent}
+              className={classes.mainHeading}
               sx={{ paddingY: "2%" }}
             >
               <Typography variant='h4' sx={{ fontWeight: 600 }}>
                 {singleExploreData.destinationName} Travel Guide
               </Typography>
             </Grid>
-            <Grid
-              item
-              xs={12}
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <CardMedia
-                component='img'
-                alt='post1'
-                image={singleExploreData.destinationImg}
-                sx={{ width: "85%" }}
-              />
+            <Grid item xs={12}>
+              <Grid
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <CardMedia
+                  component='img'
+                  alt='post1'
+                  image={singleExploreData.destinationImg}
+                  sx={{ width: "85%", margin: "1%",borderRadius:'2%' }}
+                />
+              </Grid>
             </Grid>
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
                 variant='h5'
-                sx={{ paddingTop: "2%", paddingBottom: "4%" }}
+                sx={{
+                  marginTop: "2%",
+                  marginBottom: "4%",
+                  backgroundColor: "white",
+                  padding: "3%",
+                }}
               >
                 {singleExploreData.indroduction}
               </Typography>
@@ -204,9 +212,13 @@ const UserExplore = () => {
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
-                align='center'
+                align='left'
                 variant='h5'
-                sx={{ paddingTop: "4%", fontWeight: 600 }}
+                sx={{
+                  paddingTop: "4%",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                }}
               >
                 Best Time to Visit {singleExploreData.destinationName}
               </Typography>
@@ -215,18 +227,29 @@ const UserExplore = () => {
               item
               xs={12}
               className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              sx={{ paddingY: "4%" }}
             >
-              <Typography sx={{ fontSize: 23 }}>
+              <Typography
+                sx={{
+                  fontSize: 23,
+                  backgroundColor: "whitesmoke",
+                  padding: "3%",
+                  borderRadius: 5,
+                }}
+              >
                 {singleExploreData.timeForVisit}
               </Typography>
             </Grid>
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
-                align='center'
+                align='left'
                 variant='h5'
-                sx={{ paddingTop: "4%", fontWeight: 600 }}
+                sx={{
+                  paddingTop: "4%",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                }}
               >
                 Accommodation
               </Typography>
@@ -235,18 +258,29 @@ const UserExplore = () => {
               item
               xs={12}
               className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              sx={{ paddingY: "2%" }}
             >
-              <Typography sx={{ fontSize: 23 }}>
+              <Typography
+                sx={{
+                  fontSize: 23,
+                  backgroundColor: "whitesmoke",
+                  padding: "3%",
+                  borderRadius: 5,
+                }}
+              >
                 {singleExploreData.accommodation}
               </Typography>
             </Grid>
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
-                align='center'
+                align='left'
                 variant='h5'
-                sx={{ paddingTop: "4%", fontWeight: 600 }}
+                sx={{
+                  paddingTop: "4%",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                }}
               >
                 Food
               </Typography>
@@ -255,9 +289,16 @@ const UserExplore = () => {
               item
               xs={12}
               className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              sx={{ paddingY: "2%" }}
             >
-              <Typography sx={{ fontSize: 23 }}>
+              <Typography
+                sx={{
+                  fontSize: 23,
+                  backgroundColor: "whitesmoke",
+                  padding: "3%",
+                  borderRadius: 5,
+                }}
+              >
                 {singleExploreData.food}
               </Typography>
             </Grid>
@@ -265,9 +306,13 @@ const UserExplore = () => {
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
-                align='center'
+                align='left'
                 variant='h5'
-                sx={{ paddingTop: "4%", fontWeight: 600 }}
+                sx={{
+                  paddingTop: "4%",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                }}
               >
                 Transportation
               </Typography>
@@ -276,9 +321,16 @@ const UserExplore = () => {
               item
               xs={12}
               className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              sx={{ paddingY: "2%" }}
             >
-              <Typography sx={{ fontSize: 23 }}>
+              <Typography
+                sx={{
+                  fontSize: 23,
+                  backgroundColor: "whitesmoke",
+                  padding: "3%",
+                  borderRadius: 5,
+                }}
+              >
                 {singleExploreData.transportation}
               </Typography>
             </Grid>
@@ -286,9 +338,13 @@ const UserExplore = () => {
             <Grid item xs={12} className={classes.centerContent}>
               {" "}
               <Typography
-                align='center'
+                align='left'
                 variant='h5'
-                sx={{ paddingTop: "4%", fontWeight: 600 }}
+                sx={{
+                  paddingTop: "4%",
+                  fontWeight: 600,
+                  textDecoration: "underline",
+                }}
               >
                 Safety in {singleExploreData.destinationName}
               </Typography>
@@ -297,9 +353,16 @@ const UserExplore = () => {
               item
               xs={12}
               className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              sx={{ paddingY: "2%" }}
             >
-              <Typography sx={{ fontSize: 23 }}>
+              <Typography
+                sx={{
+                  fontSize: 23,
+                  backgroundColor: "whitesmoke",
+                  padding: "3%",
+                  borderRadius: 5,
+                }}
+              >
                 {singleExploreData.safety}
               </Typography>
             </Grid>
@@ -319,8 +382,8 @@ const UserExplore = () => {
               xs={6}
               sm={6}
               md={4}
-              className={classes.centerContent}
-              sx={{ paddingY: "5%" }}
+              className={classes.mainHeading}
+              sx={{ paddingY: "3%" }}
             >
               <Box
                 sx={{
@@ -340,6 +403,7 @@ const UserExplore = () => {
                     minHeight: "auto",
                     maxWidth: "35vh",
                     maxHeight: "auto",
+                    borderRadius:2
                   }}
                 />
                 <Typography
@@ -356,7 +420,7 @@ const UserExplore = () => {
               xs={6}
               sm={6}
               md={4}
-              className={classes.centerContent}
+              className={classes.mainHeading}
               sx={{ paddingY: "5%" }}
             >
               <Box
@@ -377,6 +441,7 @@ const UserExplore = () => {
                     minHeight: "auto",
                     maxWidth: "35vh",
                     maxHeight: "auto",
+                    borderRadius:2
                   }}
                 />
                 <Typography
@@ -394,7 +459,7 @@ const UserExplore = () => {
               xs={6}
               sm={6}
               md={4}
-              className={classes.centerContent}
+              className={classes.mainHeading}
               sx={{ paddingY: "5%" }}
             >
               <Box
@@ -415,6 +480,7 @@ const UserExplore = () => {
                     minHeight: "auto",
                     maxWidth: "35vh",
                     maxHeight: "auto",
+                    borderRadius:2
                   }}
                 />
                 <Typography

@@ -63,9 +63,10 @@ const AuthHeader = () => {
                   fontWeight: "bold",
                   paddingRight: "10%",
                   paddingLeft: ".5%",
-                  fontSize: 20,
+                  fontSize: 15,
                   color: "white",
                   textDecoration: "none",
+                  fontFamily:"-moz-initial"
                 }}
               >
                 Be on the ROAD
@@ -81,9 +82,10 @@ const AuthHeader = () => {
                   fontWeight: "bold",
                   paddingRight: "1%",
                   paddingLeft: ".5%",
-                  fontSize: 20,
+                  fontSize: 15,
                   color: "white",
                   textDecoration: "none",
+                  fontFamily:"-moz-initial"
                 }}
               >
                 Be on the ROAD
@@ -100,6 +102,12 @@ const AuthHeader = () => {
                   label={"Home"}
                   component={Link}
                   to={"/author"}
+                />{" "}
+                <Tab
+                  key={"explore"}
+                  label={"Explore"}
+                  component={Link}
+                  to={"/author/explore"}
                 />
                 <Tab
                   key={"newPost"}
@@ -107,12 +115,12 @@ const AuthHeader = () => {
                   component={Link}
                   to={"/author/newpost"}
                 />
-                <Tab
+                {/* <Tab
                   key={"activity"}
                   label={"activity"}
                   component={Link}
                   to={"/author/activity"}
-                />
+                /> */}
                 <Tab
                   key={"mesage"}
                   label={"Messages"}
@@ -133,14 +141,11 @@ const AuthHeader = () => {
                 />
               </Tabs>
 
-              <Box>
+              <Box sx={{ marginLeft: "auto", marginRight: "30px" }}>
                 <IconButton
                   onClick={handleClick}
                   size='large'
-                  sx={{ ml: 2, color: "white" }}
-                  // aria-controls={open ? "account-menu" : undefined}
-                  // aria-haspopup='true'
-                  // aria-expanded={open ? "true" : undefined}
+                  sx={{ color: "white" }}
                 >
                   <Badge badgeContent={notification.length} color='error'>
                     <NotificationsActiveIcon />
@@ -152,7 +157,10 @@ const AuthHeader = () => {
                   open={open}
                   onClose={handleClose}
                 >
-                  {!notification.length && "No new messages"}
+                  {!notification.length && (
+                    <span style={{ padding: `10px` }}> No new messages </span>
+                  )}
+
                   {notification.map((notif) => (
                     <MenuItem
                       key={notif._id}
@@ -168,7 +176,7 @@ const AuthHeader = () => {
               </Box>
 
               <Button
-                sx={{ marginLeft: "auto" }}
+                // sx={{ marginLeft: "30px" }}
                 variant='contained'
                 onClick={logout}
               >

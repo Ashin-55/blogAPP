@@ -81,10 +81,11 @@ export default function PreUsers() {
         sx={{
           display: "flex",
           justifyContent: "space-between",
+          marginBottom:"10px",
         }}
       >
         <Typography variant='h4'>Premium Users</Typography>
-        <Button variant='contained' onClick={generatePDF}>
+        <Button size="small" variant='contained' onClick={generatePDF}>
           Download Report
         </Button>
       </Box>
