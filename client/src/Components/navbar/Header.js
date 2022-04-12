@@ -84,7 +84,7 @@ const Header = ({ premium }) => {
               >
                 Be on the ROAD
               </Typography>
-              <DrawerComp />
+              <DrawerComp userInfo={userInfo} />
             </>
           ) : (
             <>
