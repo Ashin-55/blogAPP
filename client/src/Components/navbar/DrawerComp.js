@@ -8,13 +8,30 @@ import {
   ListItemText,
 } from "@mui/material";
 import MenuIcon from "@material-ui/icons/Menu";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 const DrawerComp = (props) => {
   console.log(props);
+  const navigate = useNavigate();
   const [OpenDrawer, setOpenDrawer] = useState(false);
-  const logoutFun = () => {
-    setOpenDrawer(false);
+
+  const logoutAdmin = () => {
+    localStorage.removeItem("adminInfo");
+    navigate("/admin/login");
+  };
+  const logoutauth = () => {
     localStorage.removeItem("authorInfo");
+    localStorage.removeItem("authorFirstname");
+    localStorage.removeItem("authorId");
+    localStorage.removeItem("authorInfo2");
+    navigate("/author/authorLogin");
+  };
+
+  const logout = () => {
+    setOpenDrawer(false);
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("userInfo2");
+    localStorage.removeItem("userId");
+    navigate("/login");
   };
 
   return (
@@ -35,6 +52,17 @@ const DrawerComp = (props) => {
               </ListItemButton>
               <ListItemButton
                 onClick={() => setOpenDrawer(false)}
+                key={"explore"}
+                component={Link}
+                to='/author/explore'
+              >
+                <ListItemIcon>
+                  <ListItemText>Explore</ListItemText>
+                </ListItemIcon>
+              </ListItemButton>
+
+              <ListItemButton
+                onClick={() => setOpenDrawer(false)}
                 key={"newpost"}
                 component={Link}
                 to='/author/newpost'
@@ -45,24 +73,15 @@ const DrawerComp = (props) => {
               </ListItemButton>
               <ListItemButton
                 onClick={() => setOpenDrawer(false)}
-                key={"activity"}
+                key={"chat"}
                 component={Link}
-                to='/author/activity'
-              >
-                <ListItemIcon>
-                  <ListItemText>activity</ListItemText>
-                </ListItemIcon>
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => setOpenDrawer(false)}
-                key={"message"}
-                component={Link}
-                to='/author/message'
+                to='/author/chat'
               >
                 <ListItemIcon>
                   <ListItemText>Messages</ListItemText>
                 </ListItemIcon>
               </ListItemButton>
+
               <ListItemButton
                 onClick={() => setOpenDrawer(false)}
                 key={"mypost"}
@@ -73,11 +92,23 @@ const DrawerComp = (props) => {
                   <ListItemText>MyPost</ListItemText>
                 </ListItemIcon>
               </ListItemButton>
+
               <ListItemButton
-                onClick={logoutFun}
-                key={"logout"}
+                onClick={() => setOpenDrawer(false)}
+                key={"Profile"}
                 component={Link}
-                to='/'
+                to='/author/profile'
+              >
+                <ListItemIcon>
+                  <ListItemText>Profile</ListItemText>
+                </ListItemIcon>
+              </ListItemButton>
+
+              <ListItemButton
+                onClick={logoutauth}
+                key={"logoutauth"}
+                component={Link}
+                to='/author/authorLogin'
               >
                 <ListItemIcon>
                   <ListItemText>Logout</ListItemText>
@@ -113,14 +144,37 @@ const DrawerComp = (props) => {
                 to='/admin/allPreuser'
               >
                 <ListItemIcon>
-                  <ListItemText>All Athors</ListItemText>
+                  <ListItemText>All Premium Users</ListItemText>
                 </ListItemIcon>
               </ListItemButton>
+
               <ListItemButton
-                onClick={logoutFun}
-                key={"logout"}
+                onClick={() => setOpenDrawer(false)}
+                key={"authors"}
                 component={Link}
-                to='/'
+                to='/admin/authors'
+              >
+                <ListItemIcon>
+                  <ListItemText>All Authors</ListItemText>
+                </ListItemIcon>
+              </ListItemButton>
+
+              <ListItemButton
+                onClick={() => setOpenDrawer(false)}
+                key={"viewExplore"}
+                component={Link}
+                to='/admin/viewExplore'
+              >
+                <ListItemIcon>
+                  <ListItemText>Explore Data</ListItemText>
+                </ListItemIcon>
+              </ListItemButton>
+
+              <ListItemButton
+                onClick={logoutAdmin}
+                key={"logoutAdmin"}
+                component={Link}
+                to='/admin/login'
               >
                 <ListItemIcon>
                   <ListItemText>Logout</ListItemText>
@@ -153,42 +207,86 @@ const DrawerComp = (props) => {
                 onClick={() => setOpenDrawer(false)}
                 key={"becomewriter"}
                 component={Link}
-                to='/becomewriter'
+                to='/author/authorLogin'
               >
                 <ListItemIcon>
                   <ListItemText>Become an Writer</ListItemText>
                 </ListItemIcon>
               </ListItemButton>
-              <ListItemButton
-                onClick={() => setOpenDrawer(false)}
-                key={"favorites"}
-                component={Link}
-                to='/favorites'
-              >
-                <ListItemIcon>
-                  <ListItemText>Favorites</ListItemText>
-                </ListItemIcon>
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => setOpenDrawer(false)}
-                key={"login"}
-                component={Link}
-                to='/login'
-              >
-                <ListItemIcon>
-                  <ListItemText>Login</ListItemText>
-                </ListItemIcon>
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => setOpenDrawer(false)}
-                key={"Signup"}
-                component={Link}
-                to='/userSignup'
-              >
-                <ListItemIcon>
-                  <ListItemText>Signup</ListItemText>
-                </ListItemIcon>
-              </ListItemButton>
+              {props.userInfo && (
+                <ListItemButton
+                  onClick={() => setOpenDrawer(false)}
+                  key={"favorites"}
+                  component={Link}
+                  to='/wishlist'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Favorites</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
+              {props.userInfo && (
+                <ListItemButton
+                  onClick={() => setOpenDrawer(false)}
+                  key={"message"}
+                  component={Link}
+                  to='/chat'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Chat</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
+
+              {props.userInfo && (
+                <ListItemButton
+                  onClick={() => setOpenDrawer(false)}
+                  key={"Profile"}
+                  component={Link}
+                  to='/profile'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Profile</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
+
+              {props.userInfo && (
+                <ListItemButton
+                  onClick={() => setOpenDrawer(false)}
+                  key={"premium"}
+                  component={Link}
+                  to='/premium'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Premium</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
+
+              {props.userInfo ? (
+                <ListItemButton
+                  onClick={logout}
+                  key={"logout"}
+                  component={Link}
+                  to='/login'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Logout</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              ) : (
+                <ListItemButton
+                  onClick={() => setOpenDrawer(false)}
+                  key={"login"}
+                  component={Link}
+                  to='/login'
+                >
+                  <ListItemIcon>
+                    <ListItemText>Login</ListItemText>
+                  </ListItemIcon>
+                </ListItemButton>
+              )}
             </>
           )}
         </List>
