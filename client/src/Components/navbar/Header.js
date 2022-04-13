@@ -118,7 +118,7 @@ const Header = ({ premium }) => {
                 />
                 <Tab
                   key={"Writer"}
-                  label={"Become an Writer"}
+                  label={"Become a Writer"}
                   component={Link}
                   to={"/author/authorLogin"}
                 />
