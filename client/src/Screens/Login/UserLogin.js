@@ -72,7 +72,7 @@ const UserLogin = () => {
     };
 
     axios
-      .post("http://localhost:3500/login", loginData)
+      .post("/login", loginData)
       .then((res) => {
     
         // alert(res.data.message);

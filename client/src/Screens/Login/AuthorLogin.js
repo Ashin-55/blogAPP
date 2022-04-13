@@ -33,7 +33,7 @@ const AuthorLogin = () => {
       password: values.password,
     };
     axios
-      .post("http://localhost:3500/author/authorLogin", loginData)
+      .post("/author/authorLogin", loginData)
       .then((res) => {
         console.log("the response is ", res);
         toast(res.data.message, { type: "success" });

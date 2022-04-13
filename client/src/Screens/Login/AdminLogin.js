@@ -33,7 +33,7 @@ const AuthorLogin = () => {
       password: values.password,
     };
     axios
-      .post("http://localhost:3500/admin/login", loginData)
+      .post("/admin/login", loginData)
       .then((res) => {
         toast(res.data.message, { type: "success" });
         // localStorage.setItem("adminId", res.data._id);

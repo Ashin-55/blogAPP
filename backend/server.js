@@ -4,8 +4,7 @@ const cors = require("cors");
 const app = express();
 const { notFound, errorHandler } = require("./middleware/errorMiddleware");
 const connectDB = require("./config/db");
-
-// const userSchema = require("../model/userModel");
+const path = require("path");
 
 const data = require("./data/Data");
 
@@ -34,6 +33,17 @@ app.use("/admin", adminRouter);
 app.use("/api/chat", chatRouter);
 app.use("/api/message", messageRoutes);
 
+const __dirname1 = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/client/build")));
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname1, "client", "build", "index.html"));
+  });
+} else {
+  console.log("API is running not in production");
+}
+
+
 app.use((req, res, next) => {
   console.log("in not found case");
   const error = new Error(`not found -${req.originalUrl}`);
@@ -56,11 +66,11 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
   console.log("connected to socket.io");
   socket.on("setup", (userData) => {
-    console.log(userData._id,"hhh")
+    console.log(userData._id, "hhh");
     socket.join(userData._id);
     socket.emit("connected");
   });
-  socket.on("join chat", (room)  => {
+  socket.on("join chat", (room) => {
     socket.join(room);
     console.log("user joined in Room:" + room);
   });
@@ -68,13 +78,15 @@ io.on("connection", (socket) => {
   socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
   //send user message
   socket.on("new message", (newMessageRecieved) => {
-
     var chat = newMessageRecieved.chat;
-    console.log("the send message chat is in user",chat)
-    console.log("the send message newMessageRecieved is in user",newMessageRecieved)
+    console.log("the send message chat is in user", chat);
+    console.log(
+      "the send message newMessageRecieved is in user",
+      newMessageRecieved
+    );
     if (!chat.authers) return console.log("chat.users not defined");
     chat.authers.forEach((auther) => {
-      console.log(auther)
+      console.log(auther);
       if (auther._id == newMessageRecieved.sender) return;
       socket.in(auther._id).emit("message recieved", newMessageRecieved);
     });
@@ -82,11 +94,13 @@ io.on("connection", (socket) => {
   //send author message
   socket.on("new messageAuthor", (newMessageRecieved) => {
     let chat = newMessageRecieved.chat;
-    console.log("the send message chat is in author",chat)
-    console.log("the send message newMessageRecieved is in author",newMessageRecieved)
+    console.log("the send message chat is in author", chat);
+    console.log(
+      "the send message newMessageRecieved is in author",
+      newMessageRecieved
+    );
     if (!chat.users) return console.log("chat.users is  not defined");
     chat.users.forEach((user) => {
-
       if (user._id == newMessageRecieved.sender) return;
       socket.in(user._id).emit("message recieved", newMessageRecieved);
     });
